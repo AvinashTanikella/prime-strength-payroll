@@ -102,7 +102,7 @@ if st.button("🚀 Generate Payroll"):
         how="left"
     )
 
-    if pt_with_emp["EMP_ID"].isnull().any():
+    if pt_with_emp["Emp_Id"].isnull().any():
         st.error("Trainer_Info Key mismatch found!")
         st.stop()
 
@@ -124,7 +124,7 @@ if st.button("🚀 Generate Payroll"):
     # ------------------------------------------------------
 
     revenue_df = filtered_df.groupby(
-        ["EMP_ID", "Trainer_Name"]
+        ["Emp_Id", "Trainer_Name"]
     )["PT_Charges"].sum().reset_index()
 
     revenue_df.rename(columns={"PT_Charges": "PT_Revenue"}, inplace=True)
@@ -136,7 +136,7 @@ if st.button("🚀 Generate Payroll"):
     merged_df = pd.merge(
         trainer_df,
         revenue_df,
-        on=["EMP_ID", "Trainer_Name"],
+        on=["Emp_Id", "Trainer_Name"],
         how="left"
     )
 
