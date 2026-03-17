@@ -150,7 +150,7 @@ if st.button("🚀 Generate Payroll"):
 
         revenue = row["PT_Revenue"]
         base = row["Base_Salary"]
-        designation = str(row["Designation"]).lower()
+        designation = row["Designation"]
 
         fixed = base * 0.60
         perf_component = base * 0.40
@@ -170,14 +170,14 @@ if st.button("🚀 Generate Payroll"):
             perf_pct = 0
 
         # Commission
-        if designation == "junior":
+        if designation == "Junior Trainer":
             commission = revenue * 0.30
 
-        elif designation == "senior":
+        elif designation == "Senior Trainer":
             slabs = [(30000,0.30),(50000,0.35),(80000,0.40)]
             commission = progressive_calc(revenue, slabs)
 
-        elif designation == "lead":
+        elif designation == "Lead Trainer":
             slabs = [(30000,0.40),(50000,0.45),(80000,0.50)]
             commission = progressive_calc(revenue, slabs)
 
@@ -252,7 +252,25 @@ if st.button("🚀 Generate Payroll"):
 
     st.success("✅ Payroll Generated Successfully")
 
-    st.dataframe(final_df)
+    display_columns = [
+        "EMP_ID",
+        "Trainer_Name",
+        "Phone_Number",
+        "Email_Address",
+        "Trainer_Type",
+        "Designation",
+        "Base_Salary",
+        "PT_Revenue",
+        "Fixed_Salary",
+        "Performance_Pay",
+        "Performance_%",
+        "PT_Commission",
+        "Effective_PT_%",
+        "Final_Salary",
+        "Feedback"]
+
+    st.subheader("📊 Final Payroll Output")
+    st.dataframe(final_df[display_columns])
 
     # Download option
     csv = final_df.to_csv(index=False).encode('utf-8')
