@@ -4,26 +4,24 @@ Prime Strength Gym - Payroll System
 -----------------------------------------------------------
 Author: Avinash Tanikella
 
-PURPOSE:
-This Streamlit app reads:
-1. PT Declaration Sheet (trainer submissions)
-2. Trainer Master Sheet (salary + designation)
-
-Then:
-- Filters valid PT entries
-- Extracts EMP_ID from Trainer_Info
-- Aggregates PT revenue per trainer
-- Merges with Trainer Master
-- Displays payroll-ready dataset
-
-NOTE:
-This is Phase 1 → Data Processing
-Next Phase → Salary + Commission Calculation
+FULL SYSTEM:
+- Reads PT + Trainer Master
+- Maps Trainer_Key
+- Filters valid records
+- Aggregates PT revenue
+- Calculates:
+    • Fixed Salary
+    • Performance Pay
+    • Commission
+    • Final Salary
+    • Performance %
+    • Effective PT %
+    • Feedback
 ===========================================================
 """
 
 # ----------------------------------------------------------
-# IMPORT LIBRARIES
+# IMPORTS
 # ----------------------------------------------------------
 
 import streamlit as st
@@ -31,21 +29,15 @@ import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
 
-
 # ----------------------------------------------------------
 # APP TITLE
 # ----------------------------------------------------------
 
-st.title("🏋️ Prime Strength Gym - Payroll System")
-
+st.title("🏋️ Prime Strength - Salary Calculator")
 
 # ----------------------------------------------------------
-# GOOGLE SHEETS AUTHENTICATION
+# GOOGLE AUTH
 # ----------------------------------------------------------
-"""
-We use Streamlit secrets to securely store credentials.
-credentials.json is NOT stored in GitHub.
-"""
 
 scope = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -59,141 +51,215 @@ creds = Credentials.from_service_account_info(
 
 client = gspread.authorize(creds)
 
+# ----------------------------------------------------------
+# SHEET CONFIG
+# ----------------------------------------------------------
+
+PT_SHEET_NAME = "PT Declaration form (Responses)"
+PT_TAB_NAME = "Form Responses 1"
+
+TRAINER_SHEET_NAME = "Trainers Master Sheet"
+TRAINER_TAB_NAME = "Trainers"
 
 # ----------------------------------------------------------
-# CONNECT TO GOOGLE SHEETS
-# ----------------------------------------------------------
-"""
-IMPORTANT:
-Replace below sheet names EXACTLY with your actual Google Sheet names
-"""
-
-PT_SHEET_NAME = "PT Declaration form (Responses)"         #PT Declarations spreadsheet
-PT_TAB_NAME = "Form Responses 1"                          #PT Declaration Tab
-
-TRAINER_SHEET_NAME = "Trainers Master Sheet"              #Trainers spreadsheet
-TRAINER_TAB_NAME = "Trainers"                             #Trainers Tab
-
-try:
-    # Open PT Declaration Sheet
-    pt_spreadsheet = client.open(PT_SHEET_NAME)                         #spreadsheet
-    pt_sheet = pt_spreadsheet.worksheet(PT_TAB_NAME)                    #tab
-
-    # Open Trainer Master Sheet
-    trainer_spreadsheet = client.open(TRAINER_SHEET_NAME)               #spreadsheet
-    trainer_sheet = trainer_spreadsheet.worksheet(TRAINER_TAB_NAME)     #tab
-
-except Exception as e:
-    st.error(f"Error connecting to Google Sheets: {e}")
-    st.stop()
-
-
-# ----------------------------------------------------------
-# LOAD DATA INTO DATAFRAMES
+# CONNECT SHEETS
 # ----------------------------------------------------------
 
 try:
-    pt_data = pt_sheet.get_all_records()
-    trainer_data = trainer_sheet.get_all_records()
-
-    pt_df = pd.DataFrame(pt_data)
-    trainer_df = pd.DataFrame(trainer_data)
-
+    pt_sheet = client.open(PT_SHEET_NAME).worksheet(PT_TAB_NAME)
+    trainer_sheet = client.open(TRAINER_SHEET_NAME).worksheet(TRAINER_TAB_NAME)
 except Exception as e:
-    st.error(f"Error reading sheet data: {e}")
+    st.error(f"Sheet connection error: {e}")
     st.stop()
 
+# ----------------------------------------------------------
+# LOAD DATA
+# ----------------------------------------------------------
+
+pt_df = pd.DataFrame(pt_sheet.get_all_records())
+trainer_df = pd.DataFrame(trainer_sheet.get_all_records())
+
+st.subheader("📄 PT Data")
+st.dataframe(pt_df.tail(20))
+
+st.subheader("👤 Trainer Master")
+st.dataframe(trainer_df.head(10))
 
 # ----------------------------------------------------------
-# SHOW DATA PREVIEW (FOR DEBUGGING PURPOSE)
-# ----------------------------------------------------------
-
-st.subheader("📄 PT Declaration Data (Preview)")
-st.dataframe(pt_df.head())
-
-st.subheader("👤 Trainer Master Data (Preview)")
-st.dataframe(trainer_df.head())
-
-
-# ----------------------------------------------------------
-# MAIN ACTION BUTTON
+# BUTTON
 # ----------------------------------------------------------
 
 if st.button("🚀 Generate Payroll"):
 
-    st.info("Processing payroll...")
+    # ------------------------------------------------------
+    # MERGE USING Trainer_Key
+    # ------------------------------------------------------
+
+    pt_with_emp = pd.merge(
+        pt_df,
+        trainer_df,
+        on="Trainer_Key",
+        how="left"
+    )
+
+    if pt_with_emp["EMP_ID"].isnull().any():
+        st.error("Trainer_Key mismatch found!")
+        st.stop()
 
     # ------------------------------------------------------
-    # STEP 1: FILTER VALID RECORDS
+    # FILTER VALID RECORDS
     # ------------------------------------------------------
-    """
-    Conditions:
-    - Payment verified by manager
-    - Not already processed in payroll
-    """
 
-    filtered_df = pt_df[
-        (pt_df["Payment_Verified_by_Manager"].astype(str).str.upper() == "YES") &
-        (pt_df["Payroll_Processed"].astype(str).str.upper() != "YES")
+    filtered_df = pt_with_emp[
+        (pt_with_emp["Payment_Verified_by_Manager"].astype(str).str.upper() == "YES") &
+        (pt_with_emp["Payroll_Processed"].astype(str).str.upper() != "YES")
     ]
 
-    # Handle empty dataset
     if filtered_df.empty:
-        st.warning("⚠️ No valid records found for payroll processing.")
+        st.warning("No valid records")
         st.stop()
 
     # ------------------------------------------------------
-    # STEP 2: EXTRACT TRAINER NAME & EMP_ID
-    # ------------------------------------------------------
-    """
-    Trainer_Info format:
-    "Trainer Name | EMP_ID"
-    """
-
-    try:
-        split_cols = filtered_df['Trainer_Info'].str.split('|', expand=True)
-
-        filtered_df['Trainer_Name'] = split_cols[0].str.strip()
-        filtered_df['EMP_ID'] = split_cols[1].str.strip()
-
-    except Exception as e:
-        st.error(f"Error parsing Trainer_Info column: {e}")
-        st.stop()
-
-    # ------------------------------------------------------
-    # STEP 3: AGGREGATE PT REVENUE
+    # AGGREGATE PT REVENUE
     # ------------------------------------------------------
 
     revenue_df = filtered_df.groupby(
-        ['EMP_ID', 'Trainer_Name']
-    )['PT_Charges'].sum().reset_index()
+        ["EMP_ID", "Trainer_Name"]
+    )["PT_Charges"].sum().reset_index()
 
     revenue_df.rename(columns={"PT_Charges": "PT_Revenue"}, inplace=True)
 
     # ------------------------------------------------------
-    # STEP 4: MERGE WITH TRAINER MASTER
+    # MERGE BACK TO MASTER
     # ------------------------------------------------------
 
     merged_df = pd.merge(
         trainer_df,
         revenue_df,
-        on="EMP_ID",
+        on=["EMP_ID", "Trainer_Name"],
         how="left"
     )
 
-    # Replace NaN with 0 for trainers without PT revenue
     merged_df["PT_Revenue"] = merged_df["PT_Revenue"].fillna(0)
 
     # ------------------------------------------------------
-    # FINAL OUTPUT
+    # SALARY CALCULATION
     # ------------------------------------------------------
 
-    st.success("✅ Payroll base data generated successfully!")
+    def calculate_salary(row):
 
-    st.subheader("📊 Payroll Output (Before Salary Calculation)")
-    st.dataframe(merged_df)
+        revenue = row["PT_Revenue"]
+        base = row["Base_Salary"]
+        designation = str(row["Designation"]).lower()
 
+        fixed = base * 0.60
+        perf_component = base * 0.40
 
-# ----------------------------------------------------------
-# END OF SCRIPT
-# ----------------------------------------------------------
+        # Performance Pay
+        if revenue >= 80000:
+            perf = perf_component
+            perf_pct = 100
+        elif revenue >= 50000:
+            perf = perf_component * 0.75
+            perf_pct = 75
+        elif revenue >= 30000:
+            perf = perf_component * 0.50
+            perf_pct = 50
+        else:
+            perf = 0
+            perf_pct = 0
+
+        # Commission
+        if designation == "junior":
+            commission = revenue * 0.30
+
+        elif designation == "senior":
+            slabs = [(30000,0.30),(50000,0.35),(80000,0.40)]
+            commission = progressive_calc(revenue, slabs)
+
+        elif designation == "lead":
+            slabs = [(30000,0.40),(50000,0.45),(80000,0.50)]
+            commission = progressive_calc(revenue, slabs)
+
+        else:
+            commission = 0
+
+        final_salary = fixed + perf + commission
+
+        effective_pct = (commission / revenue * 100) if revenue > 0 else 0
+
+        return pd.Series({
+            "Fixed_Salary": round(fixed,2),
+            "Performance_Pay": round(perf,2),
+            "Performance_%": perf_pct,
+            "PT_Commission": round(commission,2),
+            "Effective_PT_%": round(effective_pct,2),
+            "Final_Salary": round(final_salary,2),
+            "Feedback": feedback_msg(revenue)
+        })
+
+    # ------------------------------------------------------
+    # PROGRESSIVE COMMISSION
+    # ------------------------------------------------------
+
+    def progressive_calc(revenue, slabs):
+
+        commission = 0
+        prev = 0
+
+        for limit, rate in slabs:
+
+            if revenue > limit:
+                commission += (limit - prev) * rate
+                prev = limit
+            else:
+                commission += (revenue - prev) * rate
+                return commission
+
+        commission += (revenue - prev) * slabs[-1][1]
+        return commission
+
+    # ------------------------------------------------------
+    # FEEDBACK
+    # ------------------------------------------------------
+
+    def feedback_msg(revenue):
+
+        if revenue == 0:
+            return "No PT revenue generated"
+        elif revenue < 30000:
+            return "Below expectation"
+        elif revenue < 50000:
+            return "Good start"
+        elif revenue < 80000:
+            return "Great performance"
+        else:
+            return "Excellent performance"
+
+    # ------------------------------------------------------
+    # APPLY SALARY
+    # ------------------------------------------------------
+
+    salary_df = merged_df.apply(calculate_salary, axis=1)
+
+    final_df = pd.concat([merged_df, salary_df], axis=1)
+
+    final_df = final_df.sort_values(by="PT_Revenue", ascending=False)
+
+    # ------------------------------------------------------
+    # OUTPUT
+    # ------------------------------------------------------
+
+    st.success("✅ Payroll Generated Successfully")
+
+    st.dataframe(final_df)
+
+    # Download option
+    csv = final_df.to_csv(index=False).encode('utf-8')
+
+    st.download_button(
+        "📥 Download Payroll CSV",
+        csv,
+        "payroll.csv",
+        "text/csv"
+    )
