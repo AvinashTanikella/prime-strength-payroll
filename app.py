@@ -6,7 +6,7 @@ Author: Avinash Tanikella
 
 FULL SYSTEM:
 - Reads PT + Trainer Master
-- Maps Trainer_Key
+- Maps Trainer_Info (Key)
 - Filters valid records
 - Aggregates PT revenue
 - Calculates:
@@ -92,18 +92,18 @@ st.dataframe(trainer_df.head(10))
 if st.button("🚀 Generate Payroll"):
 
     # ------------------------------------------------------
-    # MERGE USING Trainer_Key
+    # MERGE USING Trainer_Info
     # ------------------------------------------------------
 
     pt_with_emp = pd.merge(
         pt_df,
         trainer_df,
-        on="Trainer_Key",
+        on="Trainer_Info",
         how="left"
     )
 
     if pt_with_emp["EMP_ID"].isnull().any():
-        st.error("Trainer_Key mismatch found!")
+        st.error("Trainer_Info Key mismatch found!")
         st.stop()
 
     # ------------------------------------------------------
