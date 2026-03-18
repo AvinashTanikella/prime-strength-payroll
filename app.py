@@ -135,7 +135,6 @@ if st.button("🚀 Generate Payroll"):
     pt_with_emp = pd.merge(
         pt_df,
         trainer_df,
-        nfp_df,
         on="Trainer_Info",
         how="left"
     )
