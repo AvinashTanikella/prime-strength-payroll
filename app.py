@@ -61,7 +61,8 @@ payroll_run_date = today.strftime("%d-%b-%Y")            # The Date on which thi
 
 st.title("🏋️ Prime Strength - Salary Calculator")
 st.markdown(f"### 📅 Payroll ID: {payroll_run_id}")
-st.markdown(f"### 📅 Date Run: {today}")
+formatted_datetime = today.strftime("%d %b %Y | %I:%M %p")
+st.markdown(f"### 📅 Run Time: {formatted_datetime}")
 
 
 # ----------------------------------------------------------
