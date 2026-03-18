@@ -115,13 +115,13 @@ nfp_df = pd.DataFrame(nfp_sheet.get_all_records())
 
 
 st.subheader("👤 Trainer Master")
-st.dataframe(trainer_df.head(10))
+st.dataframe(trainer_df["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed Pay","Performance_Pay","Status"].head(10))
 
 st.subheader("📄 PT Data")
-st.dataframe(pt_df.tail(20))
+st.dataframe(pt_df["Trainer_Info","Client Name","PT_Charges","Payment_Verified_by_Manager"].tail(20))
 
 st.subheader("💰 Net Fixed Pay for the Trainers (as per HRMS)")
-st.dataframe(nfp_df.head(10))
+st.dataframe(nfp_df["Trainer_Info", "Month_Year", "Net_Fixed_Pay"].head(10))
 
 # ----------------------------------------------------------
 # BUTTON
