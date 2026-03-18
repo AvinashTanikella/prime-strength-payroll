@@ -53,14 +53,14 @@ else:
 
 payroll_month = datetime(year, prev_month, 1).strftime("%b_%Y")   # For which Month Payroll is Processed  (Prev)
 payroll_run_id = today.strftime("%b_%Y")                          # For which Month Payroll is Run(cur)
-payroll_run_date = today.strftime("%d-%b-%Y")            # The Date on which this Payroll was run
+payroll_run_date = today.strftime("%d-%b-%Y")                     # The Date on which this Payroll was run
 
 # ----------------------------------------------------------
 # APP TITLE
 # ----------------------------------------------------------
 
 st.title("🏋️ Prime Strength - Salary Calculator")
-st.markdown(f"### 📅 Payroll ID: {payroll_run_id}")
+st.markdown(f"### 📅 Payroll Month: {payroll_month}")
 formatted_datetime = today.strftime("%d %b %Y | %I:%M %p")
 st.markdown(f"### 📅 Run Time: {formatted_datetime}")
 
