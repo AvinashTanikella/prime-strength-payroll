@@ -333,65 +333,107 @@ if st.button("🚀 Generate Payroll"):
     # pdf function
     # ------------------------------------------------------
 
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.pagesizes import letter, landscape
 
-def generate_pdf(df, filename):
+    def generate_pdf(df, filename):
 
-    doc = SimpleDocTemplate(
-        filename,
-        pagesize=landscape(letter)
-    )
+        doc = SimpleDocTemplate(
+            filename,
+            pagesize=landscape(letter)
+        )
 
-    styles = getSampleStyleSheet()
-    elements = []
+        styles = getSampleStyleSheet()
+        elements = []
 
-    # -------------------------------
-    # HEADER (LEFT ALIGNED)
-    # -------------------------------
+        # -------------------------------
+        # HEADER (LEFT ALIGNED)
+        # -------------------------------
 
-    elements.append(Paragraph("Prime Strength Gym - Payroll Report", styles['Title']))
-    
-    elements.append(Paragraph(f"Payroll Month: {payroll_month}", styles['Normal']))
-    elements.append(Paragraph(f"Payroll Run ID: {payroll_run_id}", styles['Normal']))
-    elements.append(Paragraph(f"Run Date: {payroll_run_date}", styles['Normal']))
+        elements.append(Paragraph("Prime Strength Gym - Payroll Report", styles['Title']))
+        
+        elements.append(Paragraph(f"Payroll Month: {payroll_month}", styles['Normal']))
+        elements.append(Paragraph(f"Payroll Run ID: {payroll_run_id}", styles['Normal']))
+        elements.append(Paragraph(f"Run Date: {payroll_run_date}", styles['Normal']))
 
-    # Space before table
-    elements.append(Spacer(1, 12))   # 1 line space
+        # Space before table
+        elements.append(Spacer(1, 12))   # 1 line space
 
-    # -------------------------------
-    # TABLE
-    # -------------------------------
+        # -------------------------------
+        # TABLE
+        # -------------------------------
 
-    table_data = [df.columns.tolist()] + df.values.tolist()
+        table_data = [df.columns.tolist()] + df.values.tolist()
 
-    table = Table(table_data, repeatRows=1)
+        table = Table(table_data, repeatRows=1)
 
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.grey),
-        ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-        ('FONTSIZE', (0,0), (-1,-1), 7),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.black),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER')
-    ]))
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.grey),
+            ('TEXTCOLOR',(0,0),(-1,0),colors.white),
+            ('FONTSIZE', (0,0), (-1,-1), 7),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER')
+        ]))
 
-    elements.append(table)
+        elements.append(table)
 
-    # -------------------------------
-    # FOOTER
-    # -------------------------------
+        # -------------------------------
+        # FOOTER
+        # -------------------------------
 
-    elements.append(Spacer(1, 20))  # space after table
-    elements.append(Spacer(1, 20))  # 2 lines gap
+        elements.append(Spacer(1, 20))  # space after table
+        elements.append(Spacer(1, 20))  # 2 lines gap
 
-    elements.append(Paragraph(
-        "For Prime Strength internal use only",
-        styles['Italic']
-    ))
+        elements.append(Paragraph(
+            "For Prime Strength internal use only",
+            styles['Italic']
+        ))
 
-    doc.build(elements)
+        doc.build(elements)
+
+
+
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.pagesizes import letter, landscape
+
+    def generate_pdf(df, filename):
+
+        # LANDSCAPE MODE
+        doc = SimpleDocTemplate(
+            filename,
+            pagesize=landscape(letter)
+        )
+
+        styles = getSampleStyleSheet()
+        elements = []
+
+        # Title
+        elements.append(Paragraph("Prime Strength Gym - Payroll Report", styles['Title']))
+        elements.append(Paragraph(f"Payroll Month   : {payroll_month}", styles['Normal']))
+        elements.append(Paragraph(f"Payroll Run Date: {payroll_run_date}", styles['Normal']))
+
+        # Convert DataFrame to table
+        table_data = [df.columns.tolist()] + df.values.tolist()
+
+        # Create table
+        table = Table(table_data, repeatRows=1)
+
+        # Styling
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.grey),
+            ('TEXTCOLOR',(0,0),(-1,0),colors.white),
+            ('FONTSIZE', (0,0), (-1,-1), 7),  # smaller font
+            ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER')
+        ]))
+
+        elements.append(table)
+
+        doc.build(elements)
 
     # ------------------------------------------------------
     # OUTPUT
