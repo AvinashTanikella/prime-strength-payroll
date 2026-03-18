@@ -268,42 +268,67 @@ if st.button("🚀 Generate Payroll"):
     # UPDATE GOOGLE SHEET (MARK PROCESSED)
     # ------------------------------------------------------
 
-    records = pt_sheet.get_all_records()
+    from gspread.utils import rowcol_to_a1
 
-    for i, row in enumerate(records, start=2):  # row 2 = first data row
+    updates = []
+
+    for i, row in enumerate(records, start=2):
 
         verified = str(row.get("Payment_Verified_by_Manager", "")).upper()
         processed = str(row.get("Payroll_Processed", "")).upper()
 
         if verified == "YES" and processed != "YES":
 
-            pt_sheet.update_cell(i, pt_df.columns.get_loc("Payroll_Processed") + 1, "YES")
-            pt_sheet.update_cell(i, pt_df.columns.get_loc("Payroll_Run_ID") + 1, payroll_run_id)
+            updates.append({
+                "range": rowcol_to_a1(i, processed_col + 1),
+                "values": [["YES"]]
+            })
+
+           updates.append({
+                "range": rowcol_to_a1(i, runid_col + 1),
+                "values": [[payroll_run_id]]
+            })
+
+    if updates:
+        pt_sheet.batch_update(updates)
 
     # ------------------------------------------------------
     # pdf function
     # ------------------------------------------------------
 
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.pagesizes import letter, landscape
+
     def generate_pdf(df, filename):
 
-        doc = SimpleDocTemplate(filename)
-        styles = getSampleStyleSheet()
+        # LANDSCAPE MODE
+        doc = SimpleDocTemplate(
+            filename,
+            pagesize=landscape(letter)
+        )
 
+        styles = getSampleStyleSheet()
         elements = []
 
         # Title
         elements.append(Paragraph("Prime Strength Gym - Payroll Report", styles['Title']))
         elements.append(Paragraph(f"Payroll Run: {payroll_run_id}", styles['Normal']))
 
-        # Table Data
+        # Convert DataFrame to table
         table_data = [df.columns.tolist()] + df.values.tolist()
 
-        table = Table(table_data)
+        # Create table
+        table = Table(table_data, repeatRows=1)
 
+        # Styling
         table.setStyle(TableStyle([
             ('BACKGROUND', (0,0), (-1,0), colors.grey),
             ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-            ('GRID', (0,0), (-1,-1), 1, colors.black)
+            ('FONTSIZE', (0,0), (-1,-1), 7),  # smaller font
+            ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+            ('ALIGN', (0,0), (-1,-1), 'CENTER')
         ]))
 
         elements.append(table)
