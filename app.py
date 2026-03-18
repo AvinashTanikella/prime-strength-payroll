@@ -291,7 +291,7 @@ if st.button("🚀 Generate Payroll"):
             "Performance_%": perf_pct,
             "PT_Commission": round(commission,2),
             "Effective_PT_%": round(effective_pct,2),
-            "WP_Resp_Allowance": (wp_allowance,2),
+            "WP_Resp_Allowance": round(wp_allowance,2),
             "Final_Salary": round(final_salary,2),
             "Feedback": feedback_msg(revenue)
         })
