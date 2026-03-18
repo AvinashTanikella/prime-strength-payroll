@@ -29,12 +29,14 @@ import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime
+import pytz
 
 # ----------------------------------------------------------
 # DATE INFO 
 # ----------------------------------------------------------
 
-today = datetime.today()
+ist = pytz.timezone('Asia/Kolkata')
+today = datetime.now(ist)
 payroll_run_id = today.strftime("%b_%Y")   # Example: Mar_2026
 
 # ----------------------------------------------------------
