@@ -42,7 +42,18 @@ import pytz
 
 ist = pytz.timezone('Asia/Kolkata')
 today = datetime.now(ist)
-payroll_run_id = today.strftime("%b_%Y")   # Example: Mar_2026
+
+# Previous month logic
+if today.month == 1:
+    prev_month = 12
+    year = today.year - 1
+else:
+    prev_month = today.month - 1
+    year = today.year
+
+payroll_month = datetime(year, prev_month, 1).strftime("%b_%Y")   # For which Month Payroll is Processed  (Prev)
+payroll_run_id = today.strftime("%b_%Y")                          # For which Month Payroll is Run(cur)
+payroll_run_date = today.strftime("%d-%b-%Y")            # The Date on which this Payroll was run
 
 # ----------------------------------------------------------
 # APP TITLE
@@ -248,7 +259,7 @@ if st.button("🚀 Generate Payroll"):
         elif revenue < 30000:
             return "Below expectation"
         elif revenue < 50000:
-            return "Good start"
+            return "Good going but try hard"
         elif revenue < 80000:
             return "Great performance"
         else:
@@ -262,6 +273,11 @@ if st.button("🚀 Generate Payroll"):
 
     final_df = pd.concat([merged_df, salary_df], axis=1)
 
+    # Add tracking columns in required order
+    final_df["Payroll_Month"] = payroll_month
+    final_df["Payroll_Run_ID"] = payroll_run_id
+    final_df["Payroll_Run_Date"] = payroll_run_date
+
     final_df = final_df.sort_values(by="PT_Revenue", ascending=False)
 
     # ------------------------------------------------------
@@ -274,8 +290,10 @@ if st.button("🚀 Generate Payroll"):
     headers = pt_sheet.row_values(1)
 
     processed_col = headers.index("Payroll_Processed") + 1
+    month_col = headers.index("Payroll_Month") + 1
     runid_col = headers.index("Payroll_Run_ID") + 1
-    
+    date_col = headers.index("Payroll_Run_Date") + 1
+
     updates = []
 
     for i, row in enumerate(records, start=2):
@@ -291,9 +309,21 @@ if st.button("🚀 Generate Payroll"):
             })
 
             updates.append({
+                "range": rowcol_to_a1(i, month_col),
+                "values": [[payroll_month]]
+            })
+
+            updates.append({
                 "range": rowcol_to_a1(i, runid_col),
                 "values": [[payroll_run_id]]
             })
+
+            updates.append({
+                "range": rowcol_to_a1(i, date_col),
+                "values": [[payroll_run_date]]
+            })
+
+
 
     if updates:
         pt_sheet.batch_update(updates)
@@ -320,7 +350,8 @@ if st.button("🚀 Generate Payroll"):
 
         # Title
         elements.append(Paragraph("Prime Strength Gym - Payroll Report", styles['Title']))
-        elements.append(Paragraph(f"Payroll Run: {payroll_run_id}", styles['Normal']))
+        elements.append(Paragraph(f"Payroll Month   : {payroll_month}", styles['Normal']))
+        elements.append(Paragraph(f"Payroll Run Date: {payroll_run_date}", styles['Normal']))
 
         # Convert DataFrame to table
         table_data = [df.columns.tolist()] + df.values.tolist()
@@ -348,6 +379,9 @@ if st.button("🚀 Generate Payroll"):
     st.success(f"✅ Payroll Generated Successfully | Run: {payroll_run_id} | Time: {today.strftime('%d %b %Y, %I:%M %p')}")
     
     display_columns = [
+        "Payroll_Month",       
+        "Payroll_Run_ID",      
+        "Payroll_Run_Date",    
         "Emp_ID",
         "Trainer_Name",
         "Phone_Number",
