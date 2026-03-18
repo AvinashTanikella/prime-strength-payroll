@@ -269,7 +269,8 @@ if st.button("🚀 Generate Payroll"):
     # ------------------------------------------------------
 
     from gspread.utils import rowcol_to_a1
-
+    
+    records = pt_sheet.get_all_records()
     updates = []
 
     for i, row in enumerate(records, start=2):
