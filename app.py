@@ -251,8 +251,6 @@ if st.button("🚀 Generate Payroll"):
     # ------------------------------------------------------
 
     st.success("✅ Payroll Generated Successfully")
-
-    st.write("Final DF Columns:", final_df.columns.tolist())
     
     display_columns = [
         "Emp_ID",
