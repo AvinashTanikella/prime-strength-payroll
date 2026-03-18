@@ -131,7 +131,8 @@ st.dataframe(nfp_df[["Trainer_Info", "Month_Year", "Net_Fixed_Pay"]].head(10))
 
 def normalize_month(val):
     try:
-        return pd.to_datetime(val).strftime("%b_%Y")
+        val = str(val).replace("_", "-").upper()
+        return pd.to_datetime(val, errors='coerce').strftime("%b_%Y")
     except:
         return None
 
@@ -199,7 +200,7 @@ if st.button("🚀 Generate Payroll"):
     # ------------------------------------------------------
 
     nfp_filtered = nfp_df[
-        nfp_df["Month_Year"] == payroll_month
+        nfp_df["Month_Year"].str.upper() == payroll_month.upper()
     ]
 
     if nfp_filtered.empty:
