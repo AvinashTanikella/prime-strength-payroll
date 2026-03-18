@@ -31,17 +31,18 @@ from google.oauth2.service_account import Credentials
 from datetime import datetime
 
 # ----------------------------------------------------------
-# APP TITLE
-# ----------------------------------------------------------
-
-st.title("🏋️ Prime Strength - Salary Calculator")
-
-# ----------------------------------------------------------
 # DATE INFO 
 # ----------------------------------------------------------
 
 today = datetime.today()
 payroll_run_id = today.strftime("%b_%Y")   # Example: Mar_2026
+
+# ----------------------------------------------------------
+# APP TITLE
+# ----------------------------------------------------------
+
+st.title("🏋️ Prime Strength - Salary Calculator - ", today)
+
 
 # ----------------------------------------------------------
 # GOOGLE AUTH
