@@ -27,7 +27,6 @@ FULL SYSTEM:
 import streamlit as st
 import pandas as pd
 import gspread
-from gspread.utils import rowcol_to_a1
 from google.oauth2.service_account import Credentials
 
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
@@ -272,6 +271,11 @@ if st.button("🚀 Generate Payroll"):
     from gspread.utils import rowcol_to_a1
     
     records = pt_sheet.get_all_records()
+    headers = pt_sheet.row_values(1)
+
+    processed_col = headers.index("Payroll_Processed") + 1
+    runid_col = headers.index("Payroll_Run_ID") + 1
+    
     updates = []
 
     for i, row in enumerate(records, start=2):
