@@ -515,7 +515,6 @@ if st.button("🚀 Generate Payroll"):
         "📥 Download Payroll CSV",
         csv,
         csv_filename,
-        "payroll.csv",
         "text/csv"
     )
 
@@ -540,5 +539,5 @@ if st.button("🚀 Generate Payroll"):
         st.download_button(
             "📄 Download Payroll PDF",
             f,
-            file_name="payroll.pdf"
+            file_name=pdf_file
     )
