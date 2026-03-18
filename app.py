@@ -377,8 +377,21 @@ if st.button("🚀 Generate Payroll"):
         "text/csv"
     )
 
+    pdf_columns = [
+        "Emp_ID",
+        "Trainer_Name",
+        "Designation",
+        "PT_Revenue",
+        "Fixed_Salary",
+        "Performance_Pay",
+        "Performance_%",
+        "PT_Commission",
+        "Effective_PT_%",
+        "Final_Salary",
+        "Feedback"]
+    
     pdf_file = "payroll.pdf"
-    generate_pdf(final_df[display_columns], pdf_file)
+    generate_pdf(final_df[pdf_columns], pdf_file)
 
     with open(pdf_file, "rb") as f:
         st.download_button(
