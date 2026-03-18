@@ -275,7 +275,7 @@ if st.button("🚀 Generate Payroll"):
         verified = str(row.get("Payment_Verified_by_Manager", "")).upper()
         processed = str(row.get("Payroll_Processed", "")).upper()
 
-       if verified == "YES" and processed != "YES":
+        if verified == "YES" and processed != "YES":
 
             pt_sheet.update_cell(i, pt_df.columns.get_loc("Payroll_Processed") + 1, "YES")
             pt_sheet.update_cell(i, pt_df.columns.get_loc("Payroll_Run_ID") + 1, payroll_run_id)
