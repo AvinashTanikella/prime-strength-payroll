@@ -393,48 +393,6 @@ if st.button("🚀 Generate Payroll"):
 
         doc.build(elements)
 
-
-
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-    from reportlab.lib import colors
-    from reportlab.lib.styles import getSampleStyleSheet
-    from reportlab.lib.pagesizes import letter, landscape
-
-    def generate_pdf(df, filename):
-
-        # LANDSCAPE MODE
-        doc = SimpleDocTemplate(
-            filename,
-            pagesize=landscape(letter)
-        )
-
-        styles = getSampleStyleSheet()
-        elements = []
-
-        # Title
-        elements.append(Paragraph("Prime Strength Gym - Payroll Report", styles['Title']))
-        elements.append(Paragraph(f"Payroll Month   : {payroll_month}", styles['Normal']))
-        elements.append(Paragraph(f"Payroll Run Date: {payroll_run_date}", styles['Normal']))
-
-        # Convert DataFrame to table
-        table_data = [df.columns.tolist()] + df.values.tolist()
-
-        # Create table
-        table = Table(table_data, repeatRows=1)
-
-        # Styling
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0,0), (-1,0), colors.grey),
-            ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-            ('FONTSIZE', (0,0), (-1,-1), 7),  # smaller font
-            ('GRID', (0,0), (-1,-1), 0.5, colors.black),
-            ('ALIGN', (0,0), (-1,-1), 'CENTER')
-        ]))
-
-        elements.append(table)
-
-        doc.build(elements)
-
     # ------------------------------------------------------
     # OUTPUT
     # ------------------------------------------------------
