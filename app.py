@@ -273,8 +273,8 @@ if st.button("🚀 Generate Payroll"):
     records = pt_sheet.get_all_records()
     headers = pt_sheet.row_values(1)
 
-    processed_col = headers.index("Payroll_Processed") + 1
-    runid_col = headers.index("Payroll_Run_ID") + 1
+    processed_col = headers.index("Payroll_Processed")
+    runid_col = headers.index("Payroll_Run_ID")
     
     updates = []
 
