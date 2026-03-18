@@ -114,7 +114,7 @@ trainer_df = pd.DataFrame(trainer_sheet.get_all_records())
 nfp_df = pd.DataFrame(nfp_sheet.get_all_records())
 
 st.subheader("👤 Trainer Master")
-st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed Pay","Performance_Pay","Status"]].head(10))
+st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed Pay","Performance_Pay","WP_Responsibility_Allowance","Status"]].head(10))
 
 st.subheader("📄 PT Data")
 st.dataframe(pt_df[["Trainer_Info","Client Name","PT_Charges","Payment_Verified_by_Manager"]].tail(20))
@@ -224,6 +224,9 @@ if st.button("🚀 Generate Payroll"):
         how="left"
     )
 
+    # Ensure no nulls in allowance
+    merged_df["WP_Responsibility_Allowance"] = merged_df["WP_Responsibility_Allowance"].fillna(0)
+
     # Validate missing fixed pay
     if merged_df["Net_Fixed_Pay"].isnull().any():
         st.error("Missing Fixed Pay for some trainers")
@@ -238,6 +241,7 @@ if st.button("🚀 Generate Payroll"):
         revenue = row["PT_Revenue"]
         base = row["Base_Salary"]
         designation = row["Designation"]
+        wp_allowance = float(row.get("WP_Responsibility_Allowance", 0))
         
         # Ideal fixed (system expectation)
         fixed = base * 0.60
@@ -276,7 +280,7 @@ if st.button("🚀 Generate Payroll"):
         else:
             commission = 0
 
-        final_salary = net_fixed + perf + commission
+        final_salary = net_fixed + perf + commission + wp_allowance
 
         effective_pct = (commission / revenue * 100) if revenue > 0 else 0
 
@@ -287,6 +291,7 @@ if st.button("🚀 Generate Payroll"):
             "Performance_%": perf_pct,
             "PT_Commission": round(commission,2),
             "Effective_PT_%": round(effective_pct,2),
+            "WP_Resp_Allowance": (wp_allowance,2),
             "Final_Salary": round(final_salary,2),
             "Feedback": feedback_msg(revenue)
         })
@@ -500,6 +505,7 @@ if st.button("🚀 Generate Payroll"):
         "Performance_%",
         "PT_Commission",
         "Effective_PT_%",
+        "WP_Resp_Allowance",
         "Final_Salary",
         "Feedback"]
 
@@ -528,6 +534,7 @@ if st.button("🚀 Generate Payroll"):
         "Performance_%",
         "PT_Commission",
         "Effective_PT_%",
+        "WP_Resp_Allowance",
         "Final_Salary",
         "Feedback"]
     
