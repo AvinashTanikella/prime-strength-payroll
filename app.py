@@ -241,7 +241,7 @@ if st.button("🚀 Generate Payroll"):
         revenue = row["PT_Revenue"]
         base = row["Base_Salary"]
         designation = row["Designation"]
-        allowance = float(row.get("WP_Resp_Allowance", 0))
+        wp_allowance = float(row.get("WP_Resp_Allowance", 0))
         
         # Ideal fixed (system expectation)
         fixed = base * 0.60
