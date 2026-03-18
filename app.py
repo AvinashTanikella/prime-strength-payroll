@@ -255,7 +255,7 @@ if st.button("🚀 Generate Payroll"):
     st.write("Final DF Columns:", final_df.columns.tolist())
     
     display_columns = [
-        "EMP_ID",
+        "Emp_ID",
         "Trainer_Name",
         "Phone_Number",
         "Email_Address",
