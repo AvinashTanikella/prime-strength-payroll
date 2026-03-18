@@ -261,7 +261,7 @@ if st.button("🚀 Generate Payroll"):
     # OUTPUT
     # ------------------------------------------------------
 
-    st.success(f"✅ Payroll Generated Successfully on {today.strftime('%d-%b-%Y %I:%M %p')}")
+    st.success(f"✅ Payroll Generated Successfully | Run: {payroll_run_id} | Time: {today.strftime('%d %b %Y, %I:%M %p')}")
     
     display_columns = [
         "Emp_ID",
