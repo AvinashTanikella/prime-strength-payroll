@@ -28,6 +28,11 @@ import streamlit as st
 import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
+
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+
 from datetime import datetime
 import pytz
 
@@ -260,6 +265,52 @@ if st.button("🚀 Generate Payroll"):
     final_df = final_df.sort_values(by="PT_Revenue", ascending=False)
 
     # ------------------------------------------------------
+    # UPDATE GOOGLE SHEET (MARK PROCESSED)
+    # ------------------------------------------------------
+
+    records = pt_sheet.get_all_records()
+
+    for i, row in enumerate(records, start=2):  # row 2 = first data row
+
+        verified = str(row.get("Payment_Verified_by_Manager", "")).upper()
+        processed = str(row.get("Payroll_Processed", "")).upper()
+
+       if verified == "YES" and processed != "YES":
+
+            pt_sheet.update_cell(i, pt_df.columns.get_loc("Payroll_Processed") + 1, "YES")
+            pt_sheet.update_cell(i, pt_df.columns.get_loc("Payroll_Run_ID") + 1, payroll_run_id)
+
+    # ------------------------------------------------------
+    # pdf function
+    # ------------------------------------------------------
+
+    def generate_pdf(df, filename):
+
+        doc = SimpleDocTemplate(filename)
+        styles = getSampleStyleSheet()
+
+        elements = []
+
+        # Title
+        elements.append(Paragraph("Prime Strength Gym - Payroll Report", styles['Title']))
+        elements.append(Paragraph(f"Payroll Run: {payroll_run_id}", styles['Normal']))
+
+        # Table Data
+        table_data = [df.columns.tolist()] + df.values.tolist()
+
+        table = Table(table_data)
+
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.grey),
+            ('TEXTCOLOR',(0,0),(-1,0),colors.white),
+            ('GRID', (0,0), (-1,-1), 1, colors.black)
+        ]))
+
+        elements.append(table)
+
+        doc.build(elements)
+
+    # ------------------------------------------------------
     # OUTPUT
     # ------------------------------------------------------
 
@@ -293,4 +344,14 @@ if st.button("🚀 Generate Payroll"):
         csv,
         "payroll.csv",
         "text/csv"
+    )
+
+    pdf_file = "payroll.pdf"
+    generate_pdf(final_df[display_columns], pdf_file)
+
+    with open(pdf_file, "rb") as f:
+        st.download_button(
+            "📄 Download Payroll PDF",
+            f,
+            file_name="payroll.pdf"
     )
