@@ -113,7 +113,6 @@ pt_df = pd.DataFrame(pt_sheet.get_all_records())
 trainer_df = pd.DataFrame(trainer_sheet.get_all_records())
 nfp_df = pd.DataFrame(nfp_sheet.get_all_records())
 
-
 st.subheader("👤 Trainer Master")
 st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed Pay","Performance_Pay","Status"]].head(10))
 
@@ -122,6 +121,21 @@ st.dataframe(pt_df[["Trainer_Info","Client Name","PT_Charges","Payment_Verified_
 
 st.subheader("💰 Net Fixed Pay for the Trainers (as per HRMS)")
 st.dataframe(nfp_df[["Trainer_Info", "Month_Year", "Net_Fixed_Pay"]].head(10))
+
+
+# ----------------------------------------------------------
+# NORMALIZE MONTH FORMAT (NEW)
+# ----------------------------------------------------------
+# This ensures Month_Year is always in format: Feb_2026
+# Handles cases like: Feb-2026, February 2026, etc.
+
+def normalize_month(val):
+    try:
+        return pd.to_datetime(val).strftime("%b_%Y")
+    except:
+        return None
+
+nfp_df["Month_Year"] = nfp_df["Month_Year"].apply(normalize_month)
 
 # ----------------------------------------------------------
 # BUTTON
@@ -181,6 +195,40 @@ if st.button("🚀 Generate Payroll"):
     merged_df["PT_Revenue"] = merged_df["PT_Revenue"].fillna(0)
 
     # ------------------------------------------------------
+    # FILTER FIXED PAY FOR REQUIRED MONTH (NEW)
+    # ------------------------------------------------------
+
+    nfp_filtered = nfp_df[
+        nfp_df["Month_Year"] == payroll_month
+    ]
+
+    if nfp_filtered.empty:
+        st.error(f"No Fixed Pay data found for {payroll_month}")
+        st.stop()
+
+    # Check duplicate entries for same trainer
+    if nfp_filtered["Trainer_Info"].duplicated().any():
+        st.error("Duplicate Fixed Pay entries found for same trainer")
+        st.stop()
+
+
+    # ------------------------------------------------------
+    # MERGE FIXED PAY INTO MAIN DATA (NEW)
+    # ------------------------------------------------------
+
+    merged_df = pd.merge(
+        merged_df,
+        nfp_filtered[["Trainer_Info", "Net_Fixed_Pay"]],
+        on="Trainer_Info",
+        how="left"
+    )
+
+    # Validate missing fixed pay
+    if merged_df["Net_Fixed_Pay"].isnull().any():
+        st.error("Missing Fixed Pay for some trainers")
+        st.stop()
+
+    # ------------------------------------------------------
     # SALARY CALCULATION
     # ------------------------------------------------------
 
@@ -189,8 +237,13 @@ if st.button("🚀 Generate Payroll"):
         revenue = row["PT_Revenue"]
         base = row["Base_Salary"]
         designation = row["Designation"]
-
+        
+        # Ideal fixed (system expectation)
         fixed = base * 0.60
+        
+        # Actual fixed from HRMS sheet
+        net_fixed = float(row["Net_Fixed_Pay"])
+        
         perf_component = base * 0.40
 
         # Performance Pay
@@ -222,12 +275,13 @@ if st.button("🚀 Generate Payroll"):
         else:
             commission = 0
 
-        final_salary = fixed + perf + commission
+        final_salary = net_fixed + perf + commission
 
         effective_pct = (commission / revenue * 100) if revenue > 0 else 0
 
         return pd.Series({
-            "Fixed_Salary": round(fixed,2),
+            "Ideal_Fixed_Salary": round(fixed,2),
+            "Net_Fixed_Salary" :  round(net_fixed,2),
             "Performance_Pay": round(perf,2),
             "Performance_%": perf_pct,
             "PT_Commission": round(commission,2),
@@ -419,7 +473,7 @@ if st.button("🚀 Generate Payroll"):
         "Designation",
         "Base_Salary",
         "PT_Revenue",
-        "Fixed_Salary",
+        "Ideal_Fixed_Salary",
         "Performance_Pay",
         "Performance_%",
         "PT_Commission",
@@ -445,7 +499,7 @@ if st.button("🚀 Generate Payroll"):
         "Trainer_Name",
         "Designation",
         "PT_Revenue",
-        "Fixed_Salary",
+        "Net_Fixed_Salary",
         "Performance_Pay",
         "Performance_%",
         "PT_Commission",
