@@ -41,7 +41,9 @@ payroll_run_id = today.strftime("%b_%Y")   # Example: Mar_2026
 # APP TITLE
 # ----------------------------------------------------------
 
-st.title("🏋️ Prime Strength - Salary Calculator - ", today)
+st.title("🏋️ Prime Strength - Salary Calculator")
+st.markdown(f"### 📅 Payroll Run: {payroll_run_id}")
+st.markdown(f"### 📅 Date Run: {today}")
 
 
 # ----------------------------------------------------------
