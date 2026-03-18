@@ -281,8 +281,8 @@ if st.button("🚀 Generate Payroll"):
         effective_pct = (commission / revenue * 100) if revenue > 0 else 0
 
         return pd.Series({
-            "Ideal_Fixed_Salary": round(fixed,2),
-            "Net_Fixed_Salary" :  round(net_fixed,2),
+            "Ideal_Fixed_Pay": round(fixed,2),
+            "Net_Fixed_Pay" :  round(net_fixed,2),
             "Performance_Pay": round(perf,2),
             "Performance_%": perf_pct,
             "PT_Commission": round(commission,2),
@@ -474,7 +474,8 @@ if st.button("🚀 Generate Payroll"):
         "Designation",
         "Base_Salary",
         "PT_Revenue",
-        "Ideal_Fixed_Salary",
+        "Ideal_Fixed_Pay",
+        "Net_Fixed_Pay",
         "Performance_Pay",
         "Performance_%",
         "PT_Commission",
@@ -500,7 +501,7 @@ if st.button("🚀 Generate Payroll"):
         "Trainer_Name",
         "Designation",
         "PT_Revenue",
-        "Net_Fixed_Salary",
+        "Net_Fixed_Pay",
         "Performance_Pay",
         "Performance_%",
         "PT_Commission",
