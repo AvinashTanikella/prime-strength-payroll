@@ -509,9 +509,12 @@ if st.button("🚀 Generate Payroll"):
     # Download option
     csv = final_df.to_csv(index=False).encode('utf-8')
 
+    csv_filename = f"PrimeStrength_Payroll_{payroll_month}.csv"
+    
     st.download_button(
         "📥 Download Payroll CSV",
         csv,
+        csv_filename,
         "payroll.csv",
         "text/csv"
     )
@@ -529,7 +532,8 @@ if st.button("🚀 Generate Payroll"):
         "Final_Salary",
         "Feedback"]
     
-    pdf_file = "payroll.pdf"
+    pdf_file = f"PrimeStrength_Payroll_{payroll_month}.pdf"
+    
     generate_pdf(final_df[pdf_columns], pdf_file)
 
     with open(pdf_file, "rb") as f:
