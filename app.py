@@ -114,6 +114,7 @@ trainer_df = pd.DataFrame(trainer_sheet.get_all_records())
 nfp_df = pd.DataFrame(nfp_sheet.get_all_records())
 
 st.subheader("👤 Trainer Master")
+st.write("Trainer Columns →", trainer_df.columns.tolist())
 st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed Pay","Performance_Pay","WP_Resp_Allowance","Status"]].head(10))
 
 st.subheader("📄 PT Data")
