@@ -113,11 +113,12 @@ pt_df = pd.DataFrame(pt_sheet.get_all_records())
 trainer_df = pd.DataFrame(trainer_sheet.get_all_records())
 nfp_df = pd.DataFrame(nfp_sheet.get_all_records())
 
-st.subheader("📄 PT Data")
-st.dataframe(pt_df.tail(20))
 
 st.subheader("👤 Trainer Master")
 st.dataframe(trainer_df.head(10))
+
+st.subheader("📄 PT Data")
+st.dataframe(pt_df.tail(20))
 
 st.subheader("💰 Net Fixed Pay for the Trainers (as per HRMS)")
 st.dataframe(nfp_df.head(10))
