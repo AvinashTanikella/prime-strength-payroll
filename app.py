@@ -114,7 +114,7 @@ trainer_df = pd.DataFrame(trainer_sheet.get_all_records())
 nfp_df = pd.DataFrame(nfp_sheet.get_all_records())
 
 st.subheader("👤 Trainer Master")
-st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed Pay","Performance_Pay","WP_Responsibility_Allowance","Status"]].head(10))
+st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed Pay","Performance_Pay","WP_Resp_Allowance","Status"]].head(10))
 
 st.subheader("📄 PT Data")
 st.dataframe(pt_df[["Trainer_Info","Client Name","PT_Charges","Payment_Verified_by_Manager"]].tail(20))
@@ -225,7 +225,7 @@ if st.button("🚀 Generate Payroll"):
     )
 
     # Ensure no nulls in allowance
-    merged_df["WP_Responsibility_Allowance"] = merged_df["WP_Responsibility_Allowance"].fillna(0)
+    merged_df["WP_Resp_Allowance"] = merged_df["WP_Resp_Allowance"].fillna(0)
 
     # Validate missing fixed pay
     if merged_df["Net_Fixed_Pay"].isnull().any():
@@ -241,7 +241,7 @@ if st.button("🚀 Generate Payroll"):
         revenue = row["PT_Revenue"]
         base = row["Base_Salary"]
         designation = row["Designation"]
-        wp_allowance = float(row.get("WP_Responsibility_Allowance", 0))
+        allowance = float(row.get("WP_Resp_Allowance", 0))
         
         # Ideal fixed (system expectation)
         fixed = base * 0.60
