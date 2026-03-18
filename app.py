@@ -335,7 +335,27 @@ if st.button("🚀 Generate Payroll"):
 
     salary_df = merged_df.apply(calculate_salary, axis=1)
 
-    final_df = pd.concat([merged_df, salary_df], axis=1)
+    # Remove duplicate columns before merging salary_df
+    cols_to_drop = [
+        "Ideal_Fixed_Salary",
+        "Net_Fixed_Salary",
+        "Performance_Pay",
+        "Performance_%",
+        "PT_Commission",
+        "Effective_PT_%",
+        "Final_Salary",
+        "Feedback"
+    ]
+
+    merged_df = merged_df.drop(columns=[col for col in cols_to_drop if col in merged_df.columns])
+    
+    #final_df = pd.concat([merged_df, salary_df], axis=1)
+
+    for col in salary_df.columns:
+        merged_df[col] = salary_df[col]
+
+    final_df = merged_df
+
 
     # Add tracking columns in required order
     final_df["Payroll_Month"] = payroll_month
