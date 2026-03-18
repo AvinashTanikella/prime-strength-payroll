@@ -273,8 +273,8 @@ if st.button("🚀 Generate Payroll"):
     records = pt_sheet.get_all_records()
     headers = pt_sheet.row_values(1)
 
-    processed_col = headers.index("Payroll_Processed")
-    runid_col = headers.index("Payroll_Run_ID")
+    processed_col = headers.index("Payroll_Processed") + 1
+    runid_col = headers.index("Payroll_Run_ID") + 1
     
     updates = []
 
@@ -286,12 +286,12 @@ if st.button("🚀 Generate Payroll"):
         if verified == "YES" and processed != "YES":
 
             updates.append({
-                "range": rowcol_to_a1(i, processed_col + 1),
+                "range": rowcol_to_a1(i, processed_col),
                 "values": [["YES"]]
             })
 
             updates.append({
-                "range": rowcol_to_a1(i, runid_col + 1),
+                "range": rowcol_to_a1(i, runid_col),
                 "values": [[payroll_run_id]]
             })
 
