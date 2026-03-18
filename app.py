@@ -91,6 +91,8 @@ PT_TAB_NAME = "Form Responses 1"
 TRAINER_SHEET_NAME = "Trainers Master Sheet"
 TRAINER_TAB_NAME = "Trainers"
 
+NFP_SHEET_NAME = "Trainers_NFP_Form"
+NFP_TAB_NAME = "Trainers_NFP"
 # ----------------------------------------------------------
 # CONNECT SHEETS
 # ----------------------------------------------------------
@@ -98,6 +100,7 @@ TRAINER_TAB_NAME = "Trainers"
 try:
     pt_sheet = client.open(PT_SHEET_NAME).worksheet(PT_TAB_NAME)
     trainer_sheet = client.open(TRAINER_SHEET_NAME).worksheet(TRAINER_TAB_NAME)
+    nfp_sheet = client.open(NFP_SHEET_NAME).worksheet(NFP_TAB_NAME)
 except Exception as e:
     st.error(f"Sheet connection error: {e}")
     st.stop()
@@ -108,12 +111,16 @@ except Exception as e:
 
 pt_df = pd.DataFrame(pt_sheet.get_all_records())
 trainer_df = pd.DataFrame(trainer_sheet.get_all_records())
+nfp_df = pd.DataFrame(nfp_sheet.get_all_records())
 
 st.subheader("📄 PT Data")
 st.dataframe(pt_df.tail(20))
 
 st.subheader("👤 Trainer Master")
 st.dataframe(trainer_df.head(10))
+
+st.subheader("💰 Net Fixed Pay for the Trainers (as per HRMS)")
+st.dataframe(nfp_df.head(10))
 
 # ----------------------------------------------------------
 # BUTTON
@@ -128,6 +135,7 @@ if st.button("🚀 Generate Payroll"):
     pt_with_emp = pd.merge(
         pt_df,
         trainer_df,
+        nfp_df,
         on="Trainer_Info",
         how="left"
     )
