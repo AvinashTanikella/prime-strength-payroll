@@ -375,6 +375,28 @@ if st.button("🚀 Generate Payroll"):
 
     final_df = final_df.sort_values(by="PT_Revenue", ascending=False)
 
+    total_row = {
+    "Emp_ID": "TOTALS",
+    "Trainer_Name": "",
+    "Designation": "",
+
+    "PT_Revenue": final_df["PT_Revenue"].sum(),
+    "Net_Fixed_Pay": final_df["Net_Fixed_Pay"].sum(),
+    "Performance_Pay": final_df["Performance_Pay"].sum(),
+    "PT_Commission": final_df["PT_Commission"].sum(),
+    "WP_Resp_Allowance": final_df["WP_Resp_Allowance"].sum(),
+    "Penalty": final_df["Penalty"].sum(),
+    "Final_Salary": final_df["Final_Salary"].sum(),
+
+    "Performance_%": "-",
+    "Effective_PT_%": "-",
+    "Feedback": "-"
+    }
+
+    total_df = pd.DataFrame([total_row])
+
+    export_df = pd.concat([final_df, total_df], ignore_index=True)
+
     # ------------------------------------------------------
     # UPDATE GOOGLE SHEET (MARK PROCESSED)
     # ------------------------------------------------------
@@ -464,11 +486,28 @@ if st.button("🚀 Generate Payroll"):
         table = Table(table_data, repeatRows=1)
 
         table.setStyle(TableStyle([
+        # -------------------------------
+        # EXISTING STYLING
+        # -------------------------------
             ('BACKGROUND', (0,0), (-1,0), colors.grey),
             ('TEXTCOLOR',(0,0),(-1,0),colors.white),
             ('FONTSIZE', (0,0), (-1,-1), 7),
             ('GRID', (0,0), (-1,-1), 0.5, colors.black),
-            ('ALIGN', (0,0), (-1,-1), 'CENTER')
+            ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        # -------------------------------
+        # TOTAL ROW STYLING
+        # -------------------------------
+            ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+        #   ('FONTSIZE', (0, -1), (-1, -1), 8),
+        #   ('TEXTCOLOR', (0, -1), (-1, -1), colors.black),
+        # -------------------------------
+        # MERGE FIRST 3 COLUMNS
+        # -------------------------------
+            ('SPAN', (0, -1), (2, -1)),   # Merge col 0 to 2
+        # Align TOTALS text to left
+            ('ALIGN', (0, -1), (2, -1), 'LEFT'),
+
         ]))
 
         elements.append(table)
@@ -519,7 +558,7 @@ if st.button("🚀 Generate Payroll"):
     st.dataframe(final_df[display_columns])
 
     # Download option
-    csv = final_df.to_csv(index=False).encode('utf-8')
+    csv = export_df.to_csv(index=False).encode('utf-8')
 
     csv_filename = f"PrimeStrength_Payroll_{payroll_month}.csv"
     
@@ -547,7 +586,9 @@ if st.button("🚀 Generate Payroll"):
     
     pdf_file = f"PrimeStrength_Payroll_{payroll_month}.pdf"
     
-    generate_pdf(final_df[pdf_columns], pdf_file)
+    pdf_export_df = pd.concat([final_df[pdf_columns], total_df], ignore_index=True)
+
+    generate_pdf(pdf_export_df, pdf_file)
 
     with open(pdf_file, "rb") as f:
         st.download_button(
