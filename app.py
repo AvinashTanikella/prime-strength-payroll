@@ -558,7 +558,7 @@ if st.button("🚀 Generate Payroll"):
     st.dataframe(final_df[display_columns])
 
     # Download option
-    csv = export_df.to_csv(index=False).encode('utf-8')
+    csv = export_df[display_columns].to_csv(index=False).encode('utf-8')
 
     csv_filename = f"PrimeStrength_Payroll_{payroll_month}.csv"
     
@@ -585,8 +585,12 @@ if st.button("🚀 Generate Payroll"):
         "Feedback"]
     
     pdf_file = f"PrimeStrength_Payroll_{payroll_month}.pdf"
-    
-    pdf_export_df = pd.concat([final_df[pdf_columns], total_df], ignore_index=True)
+
+    pdf_export_df = pd.concat(
+    [final_df[pdf_columns], total_df[pdf_columns]],
+    ignore_index=True)
+
+    pdf_export_df = pdf_export_df.fillna("").astype(str)
 
     generate_pdf(pdf_export_df, pdf_file)
 
