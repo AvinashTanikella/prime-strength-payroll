@@ -114,7 +114,7 @@ trainer_df = pd.DataFrame(trainer_sheet.get_all_records())
 nfp_df = pd.DataFrame(nfp_sheet.get_all_records())
 
 st.subheader("👤 Trainer's Data - Company Defined")
-st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed_Pay","Performance_Pay","WP_Resp_Allowance","Status"]].head(10))
+st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed_Pay(60% of Base)","Performance_Pay(40% of Base)","WP_Resp_Allowance","Status"]].head(10))
 
 st.subheader("📄 PT Declarations - Trainers Defined")
 st.dataframe(pt_df[["Trainer_Info","Client Name","PT_Charges","Payment_Verified_by_Manager"]].tail(60))
