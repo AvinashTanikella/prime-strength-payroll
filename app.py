@@ -117,7 +117,7 @@ st.subheader("👤 Trainer's Data - Company Defined")
 st.dataframe(trainer_df[["Emp_ID","Trainer_Name","Phone_Number","Trainer_Type","Designation","Base_Salary","Fixed_Pay","Performance_Pay","WP_Resp_Allowance","Status"]].head(10))
 
 st.subheader("📄 PT Declarations - Trainers Defined")
-st.dataframe(pt_df[["Trainer_Info","Client Name","PT_Charges","Payment_Verified_by_Manager"]].tail(20))
+st.dataframe(pt_df[["Trainer_Info","Client Name","PT_Charges","Payment_Verified_by_Manager"]].tail(60))
 
 st.subheader("💰 Net Fixed Pay for the Trainers (as per HRMS)")
 st.dataframe(nfp_df[["Trainer_Info", "Month_Year", "Net_Fixed_Pay"]].head(10))
