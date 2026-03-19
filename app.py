@@ -283,7 +283,7 @@ if st.button("🚀 Generate Payroll"):
         #penalty calculation
         penalty = 0
         if revenue == 0:
-            penalty = fixed * 0.50
+            penalty = net_fixed * 0.50
 
         final_salary = net_fixed + perf + commission + wp_allowance - penalty
 
