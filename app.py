@@ -85,11 +85,11 @@ client = gspread.authorize(creds)
 # SHEET CONFIG
 # ----------------------------------------------------------
 
-PT_SHEET_NAME = "PT Declaration form (Responses)"
-PT_TAB_NAME = "Form Responses 1"
+PT_SHEET_NAME = "PT_Declaration_Form"
+PT_TAB_NAME = "PT_Declarations-ALL"
 
-TRAINER_SHEET_NAME = "Trainers Master Sheet"
-TRAINER_TAB_NAME = "Trainers"
+TRAINER_SHEET_NAME = "Trainers_Master_Sheet"
+TRAINER_TAB_NAME = "Trainers_Details"
 
 NFP_SHEET_NAME = "Trainers_NFP_Form"
 NFP_TAB_NAME = "Trainers_NFP"
