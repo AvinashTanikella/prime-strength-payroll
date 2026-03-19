@@ -280,7 +280,12 @@ if st.button("🚀 Generate Payroll"):
         else:
             commission = 0
 
-        final_salary = net_fixed + perf + commission + wp_allowance
+        #penalty calculation
+        penalty = 0
+        if revenue == 0:
+            penalty = fixed * 0.50
+
+        final_salary = net_fixed + perf + commission + wp_allowance - penalty
 
         effective_pct = (commission / revenue * 100) if revenue > 0 else 0
 
@@ -292,6 +297,7 @@ if st.button("🚀 Generate Payroll"):
             "PT_Commission": round(commission,2),
             "Effective_PT_%": round(effective_pct,2),
             "WP_Resp_Allowance": round(wp_allowance,2),
+            "Penalty": round(penalty,2),
             "Final_Salary": round(final_salary,2),
             "Feedback": feedback_msg(revenue)
         })
@@ -499,13 +505,13 @@ if st.button("🚀 Generate Payroll"):
         "Designation",
         "Base_Salary",
         "PT_Revenue",
-        "Ideal_Fixed_Pay",
         "Net_Fixed_Pay",
         "Performance_Pay",
         "Performance_%",
         "PT_Commission",
         "Effective_PT_%",
         "WP_Resp_Allowance",
+        "Penalty",
         "Final_Salary",
         "Feedback"]
 
@@ -535,6 +541,7 @@ if st.button("🚀 Generate Payroll"):
         "PT_Commission",
         "Effective_PT_%",
         "WP_Resp_Allowance",
+        "Penalty",
         "Final_Salary",
         "Feedback"]
     
