@@ -512,7 +512,7 @@ if st.button("🚀 Generate Payroll"):
         # EXISTING STYLING
         # -------------------------------
             #Entire Table
-            ('FONTSIZE', (0,0), (-1,-1), 7),
+            ('FONTSIZE', (0,0), (-1,-1), 6.8),
             ('GRID', (0,0), (-1,-1), 0.5, colors.black),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
