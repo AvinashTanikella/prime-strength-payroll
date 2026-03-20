@@ -494,7 +494,13 @@ if st.button("🚀 Generate Payroll"):
         # TABLE
         # -------------------------------
 
-        table_data = [df.columns.tolist()] + df.values.tolist()
+        pdf_columns = df.columns.tolist()
+
+        pdf_columns = [
+            "Net_Perf_Pay" if col == "Net_Performance_Pay" else col
+            for col in pdf_columns
+]
+        table_data = [pdf_columns] + df.values.tolist()
 
         available_width = doc.width
         num_cols = len(df.columns)
@@ -505,12 +511,18 @@ if st.button("🚀 Generate Payroll"):
         # -------------------------------
         # EXISTING STYLING
         # -------------------------------
-            ('BACKGROUND', (0,0), (-1,0), colors.grey),
-            ('TEXTCOLOR',(0,0),(-1,0),colors.white),
+            #Entire Table
             ('FONTSIZE', (0,0), (-1,-1), 6.5),
             ('GRID', (0,0), (-1,-1), 0.5, colors.black),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            #Header Row
+            ('BACKGROUND', (0,0), (-1,0), colors.grey),
+            ('TEXTCOLOR',(0,0),(-1,0),colors.white),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0,0), (-1,0), 7),
+            ('TOPPADDING', (0,0), (-1,0), 8),
+            ('BOTTOMPADDING', (0,0), (-1,0), 8),
         # -------------------------------        
         # PADDING
         # -------------------------------
@@ -525,11 +537,13 @@ if st.button("🚀 Generate Payroll"):
             ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
             ('FONTSIZE', (0, -1), (-1, -1), 8),
             ('TEXTCOLOR', (0, -1), (-1, -1), colors.black),
+            ('TOPPADDING', (0,-1), (-1,-1), 8),
+            ('BOTTOMPADDING', (0,-1), (-1,-1), 8),
         # -------------------------------
         # MERGE FIRST 3 COLUMNS
         # -------------------------------
             ('SPAN', (0, -1), (2, -1)),   # Merge col 0 to 2
-        # Align TOTALS text to left
+        # Align TOTALS text to center
             ('ALIGN', (0, -1), (2, -1), 'CENTER'),
 
         ]))
