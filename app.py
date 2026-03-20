@@ -85,13 +85,13 @@ client = gspread.authorize(creds)
 # SHEET CONFIG
 # ----------------------------------------------------------
 
-PT_SHEET_NAME = "PT_Declaration_Form"
+PT_SHEET_NAME = "PT_Data"
 PT_TAB_NAME = "PT_Declarations-ALL"
 
-TRAINER_SHEET_NAME = "Trainers_Master_Sheet"
+TRAINER_SHEET_NAME = "Trainers_Master_Data"
 TRAINER_TAB_NAME = "Trainers_Details"
 
-NFP_SHEET_NAME = "Trainers_NFP_Form"
+NFP_SHEET_NAME = "Trainers_NFP_Data"
 NFP_TAB_NAME = "Trainers_NFP"
 # ----------------------------------------------------------
 # CONNECT SHEETS
