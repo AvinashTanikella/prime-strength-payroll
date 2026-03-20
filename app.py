@@ -227,7 +227,6 @@ if st.button("🚀 Generate Payroll"):
     # Ensure allowance safe
     merged_df["WP_Resp_Allowance"] = merged_df["WP_Resp_Allowance"].fillna(0)
 
-
     # ------------------------------------------------------
     # PROGRESSIVE COMMISSION (FIXED POSITION)
     # ------------------------------------------------------
@@ -249,7 +248,6 @@ if st.button("🚀 Generate Payroll"):
         commission += (revenue - prev) * slabs[-1][1]
         return commission
 
-
     # ------------------------------------------------------
     # FEEDBACK FUNCTION
     # ------------------------------------------------------
@@ -258,15 +256,33 @@ if st.button("🚀 Generate Payroll"):
 
         if revenue == 0:
             return "1-Poor"
-        elif revenue < 30000:
+        elif revenue < min_t:
             return "2-Below Expctd."
-        elif revenue < 50000:
+        elif revenue < mid_t:
             return "3-Average"
-        elif revenue < 80000:
+        elif revenue < high_t:
             return "4-Great"
         else:
             return "5-Excellent"
     
+    # ------------------------------------------------------
+    # GET THRESHOLD FUNCTION
+    # ------------------------------------------------------
+    def get_thresholds(trainer_type):
+
+        if trainer_type == "Part-Time":
+            return {
+                "min": 20000,
+                "mid": 35000,
+                "high": 50000
+            }
+        else:  # Full-Time
+            return {
+                "min": 30000,
+                "mid": 50000,
+                "high": 80000
+            }
+
     # ------------------------------------------------------
     # SALARY CALCULATION
     # ------------------------------------------------------
@@ -282,13 +298,21 @@ if st.button("🚀 Generate Payroll"):
         fixed = base * 0.60
         perf_component = base * 0.40
 
-        if revenue >= 80000:
+
+        trainer_type = row.get("Trainer_Type", "Full-Time")
+        thresholds = get_thresholds(trainer_type)
+
+        min_t = thresholds["min"]
+        mid_t = thresholds["mid"]
+        high_t = thresholds["high"]
+
+        if revenue >= high_t:
             perf = perf_component
             perf_pct = 100
-        elif revenue >= 50000:
+        elif revenue >= mid_t:
             perf = perf_component * 0.75
             perf_pct = 75
-        elif revenue >= 30000:
+        elif revenue >= min_t:
             perf = perf_component * 0.50
             perf_pct = 50
         else:
