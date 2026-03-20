@@ -337,7 +337,7 @@ if st.button("🚀 Generate Payroll"):
         "Final_Salary": round(final_salary, 2),
         "Performance_%": perf_pct,
         "Feedback": feedback_msg(revenue)
-    }))
+    })
 
     # ------------------------------------------------------
     # APPLY SALARY
