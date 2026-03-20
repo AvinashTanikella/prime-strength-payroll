@@ -439,7 +439,6 @@ if st.button("🚀 Generate Payroll"):
     from reportlab.lib import colors
     from reportlab.lib.styles import getSampleStyleSheet
     from reportlab.lib.pagesizes import A4, landscape
-    from reportlab.lib.styles import ParagraphStyle
 
     def generate_pdf(df, filename):
 
@@ -472,23 +471,7 @@ if st.button("🚀 Generate Payroll"):
         # TABLE
         # -------------------------------
 
-        feedback_col_index = list(df.columns).index("Feedback")
-        
-        uniform_style = ParagraphStyle(
-            'uniform_style',
-            parent=styles['Normal'],
-            fontSize=6,
-            leading=7  # controls row height (important)
-        )
-
-        #table_data = [df.columns.tolist()]
-        table_data = [[Paragraph(str(col), uniform_style) for col in df.columns]]
-
-        for row in df.values.tolist():
-            new_row = []
-            for i, cell in enumerate(row):
-                new_row.append(Paragraph(str(cell), uniform_style))
-            table_data.append(new_row)
+        table_data = [df.columns.tolist()] + df.values.tolist()
 
         available_width = doc.width
         num_cols = len(df.columns)
@@ -501,7 +484,7 @@ if st.button("🚀 Generate Payroll"):
         # -------------------------------
             ('BACKGROUND', (0,0), (-1,0), colors.grey),
             ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-            ('FONTSIZE', (0,0), (-1,-1), 6.5),
+            ('FONTSIZE', (0,0), (-1,-1), 6),
             ('GRID', (0,0), (-1,-1), 0.5, colors.black),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
         # -------------------------------        
