@@ -330,7 +330,7 @@ if st.button("🚀 Generate Payroll"):
         "Effective_PT_%": round(effective_pct, 2),
 
         # ---------------- ADJUSTMENTS ----------------
-        "WP_Resp_Allowance": round(wp_allowance, 2),
+        "WP_Allowance": round(wp_allowance, 2),
         "Penalty": round(penalty, 2),
 
         # ---------------- FINAL ----------------
@@ -373,7 +373,7 @@ if st.button("🚀 Generate Payroll"):
         "Net_Fixed_Pay": final_df["Net_Fixed_Pay"].sum(),
         "Net_Performance_Pay": final_df["Net_Performance_Pay"].sum(),
         "PT_Commission": final_df["PT_Commission"].sum(),
-        "WP_Resp_Allowance": final_df["WP_Resp_Allowance"].sum(),
+        "WP_Allowance": final_df["WP_Allowance"].sum(),
         "Penalty": final_df["Penalty"].sum(),
         "Final_Salary": final_df["Final_Salary"].sum(),
         "Performance_%": "-",
@@ -438,14 +438,18 @@ if st.button("🚀 Generate Payroll"):
     from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
     from reportlab.lib import colors
     from reportlab.lib.styles import getSampleStyleSheet
-    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.lib.pagesizes import A4, landscape
 
     def generate_pdf(df, filename):
 
-        doc = SimpleDocTemplate(
-            filename,
-            pagesize=landscape(letter)
-        )
+    doc = SimpleDocTemplate(
+        filename,
+        pagesize=landscape(A4),
+        leftMargin=10,
+        rightMargin=10,
+        topMargin=10,
+        bottomMargin=10
+    )
 
         styles = getSampleStyleSheet()
         elements = []
@@ -469,7 +473,10 @@ if st.button("🚀 Generate Payroll"):
 
         table_data = [df.columns.tolist()] + df.values.tolist()
 
-        table = Table(table_data, repeatRows=1)
+        available_width = doc.width
+        num_cols = len(df.columns)
+    
+        table = Table(table_data, repeatRows=1, colWidths=[available_width / num_cols] * num_cols)
 
         table.setStyle(TableStyle([
         # -------------------------------
@@ -477,9 +484,16 @@ if st.button("🚀 Generate Payroll"):
         # -------------------------------
             ('BACKGROUND', (0,0), (-1,0), colors.grey),
             ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-            ('FONTSIZE', (0,0), (-1,-1), 7),
+            ('FONTSIZE', (0,0), (-1,-1), 6),
             ('GRID', (0,0), (-1,-1), 0.5, colors.black),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        # -------------------------------        
+        # PADDING
+        # -------------------------------
+            ('LEFTPADDING', (0,0), (-1,-1), 3),
+            ('RIGHTPADDING', (0,0), (-1,-1), 3),
+            ('TOPPADDING', (0,0), (-1,-1), 2),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 2),
         # -------------------------------
         # TOTAL ROW STYLING
         # -------------------------------
@@ -548,7 +562,7 @@ if st.button("🚀 Generate Payroll"):
     "Effective_PT_%",
 
     # ---------------- ADJUSTMENTS ----------------
-    "WP_Resp_Allowance",
+    "WP_Allowance",
     "Penalty",
 
     # ---------------- FINAL ----------------
@@ -581,7 +595,7 @@ if st.button("🚀 Generate Payroll"):
         "PT_Revenue",
         "PT_Commission",
         "Effective_PT_%",
-        "WP_Resp_Allowance",
+        "WP_Allowance",
         "Penalty",
         "Final_Salary",
         "Feedback"]
