@@ -145,58 +145,13 @@ nfp_df["Month_Year"] = nfp_df["Month_Year"].apply(normalize_month)
 if st.button("🚀 Generate Payroll"):
 
     # ------------------------------------------------------
-    # MERGE USING Trainer_Info
+    # STEP 1: START WITH TRAINER MASTER (DRIVER)
     # ------------------------------------------------------
 
-    pt_with_emp = pd.merge(
-        pt_df,
-        trainer_df,
-        on="Trainer_Info",
-        how="left"
-    )
-
-    if pt_with_emp["Emp_ID"].isnull().any():
-        st.error("Trainer_Info Key mismatch found!")
-        st.stop()
+    merged_df = trainer_df.copy()
 
     # ------------------------------------------------------
-    # FILTER VALID RECORDS
-    # ------------------------------------------------------
-
-    filtered_df = pt_with_emp[
-        (pt_with_emp["Payment_Verified_by_Manager"].astype(str).str.upper() == "YES") &
-        (pt_with_emp["Payroll_Processed"].astype(str).str.upper() != "YES")
-    ]
-
-    if filtered_df.empty:
-        st.warning("No valid records")
-        st.stop()
-
-    # ------------------------------------------------------
-    # AGGREGATE PT REVENUE
-    # ------------------------------------------------------
-
-    revenue_df = filtered_df.groupby(
-        ["Emp_ID", "Trainer_Name"]
-    )["PT_Charges"].sum().reset_index()
-
-    revenue_df.rename(columns={"PT_Charges": "PT_Revenue"}, inplace=True)
-
-    # ------------------------------------------------------
-    # MERGE BACK TO MASTER
-    # ------------------------------------------------------
-
-    merged_df = pd.merge(
-        trainer_df,
-        revenue_df,
-        on=["Emp_ID", "Trainer_Name"],
-        how="left"
-    )
-
-    merged_df["PT_Revenue"] = merged_df["PT_Revenue"].fillna(0)
-
-    # ------------------------------------------------------
-    # FILTER FIXED PAY FOR REQUIRED MONTH (NEW)
+    # STEP 2: FILTER FIXED PAY FOR REQUIRED MONTH
     # ------------------------------------------------------
 
     nfp_filtered = nfp_df[
@@ -207,14 +162,12 @@ if st.button("🚀 Generate Payroll"):
         st.error(f"No Fixed Pay data found for {payroll_month}")
         st.stop()
 
-    # Check duplicate entries for same trainer
     if nfp_filtered["Trainer_Info"].duplicated().any():
         st.error("Duplicate Fixed Pay entries found for same trainer")
         st.stop()
 
-
     # ------------------------------------------------------
-    # MERGE FIXED PAY INTO MAIN DATA (NEW)
+    # STEP 3: MERGE NFP (MANDATORY)
     # ------------------------------------------------------
 
     merged_df = pd.merge(
@@ -224,13 +177,56 @@ if st.button("🚀 Generate Payroll"):
         how="left"
     )
 
-    # Ensure no nulls in allowance
-    merged_df["WP_Resp_Allowance"] = merged_df["WP_Resp_Allowance"].fillna(0)
-
-    # Validate missing fixed pay
     if merged_df["Net_Fixed_Pay"].isnull().any():
         st.error("Missing Fixed Pay for some trainers")
         st.stop()
+
+    # ------------------------------------------------------
+    # STEP 4: PROCESS PT DATA (OPTIONAL)
+    # ------------------------------------------------------
+
+    pt_with_emp = pd.merge(
+        pt_df,
+        trainer_df,
+        on="Trainer_Info",
+        how="left"
+    )
+
+    if pt_with_emp["Emp_ID"].isnull().any():
+        st.error("Trainer_Info Key mismatch found in PT data!")
+        st.stop()
+
+    filtered_df = pt_with_emp[
+        (pt_with_emp["Payment_Verified_by_Manager"].astype(str).str.upper() == "YES") &
+        (pt_with_emp["Payroll_Processed"].astype(str).str.upper() != "YES")
+    ]
+
+    if not filtered_df.empty:
+        revenue_df = filtered_df.groupby(
+            ["Emp_ID", "Trainer_Name"]
+        )["PT_Charges"].sum().reset_index()
+
+        revenue_df.rename(columns={"PT_Charges": "PT_Revenue"}, inplace=True)
+    else:
+        st.warning("No PT records found. Continuing with zero revenue.")
+        revenue_df = pd.DataFrame(columns=["Emp_ID", "Trainer_Name", "PT_Revenue"])
+
+    # ------------------------------------------------------
+    # STEP 5: MERGE PT DATA (LAST)
+    # ------------------------------------------------------
+
+    merged_df = pd.merge(
+        merged_df,
+        revenue_df,
+        on=["Emp_ID", "Trainer_Name"],
+        how="left"
+    )
+
+    # CRITICAL FIX
+    merged_df["PT_Revenue"] = merged_df.get("PT_Revenue", 0).fillna(0)
+
+    # Ensure allowance safe
+    merged_df["WP_Resp_Allowance"] = merged_df["WP_Resp_Allowance"].fillna(0)
 
     # ------------------------------------------------------
     # SALARY CALCULATION
@@ -238,20 +234,15 @@ if st.button("🚀 Generate Payroll"):
 
     def calculate_salary(row):
 
-        revenue = row["PT_Revenue"]
-        base = row["Base_Salary"]
-        designation = row["Designation"]
+        revenue = float(row.get("PT_Revenue", 0))
+        base = float(row.get("Base_Salary", 0))
+        designation = row.get("Designation", "")
         wp_allowance = float(row.get("WP_Resp_Allowance", 0))
-        
-        # Ideal fixed (system expectation)
+        net_fixed = float(row.get("Net_Fixed_Pay", 0))
+
         fixed = base * 0.60
-        
-        # Actual fixed from HRMS sheet
-        net_fixed = float(row["Net_Fixed_Pay"])
-        
         perf_component = base * 0.40
 
-        # Performance Pay
         if revenue >= 80000:
             perf = perf_component
             perf_pct = 100
@@ -265,7 +256,6 @@ if st.button("🚀 Generate Payroll"):
             perf = 0
             perf_pct = 0
 
-        # Commission
         if designation == "Junior Trainer":
             commission = revenue * 0.30
 
@@ -280,18 +270,14 @@ if st.button("🚀 Generate Payroll"):
         else:
             commission = 0
 
-        #penalty calculation
-        penalty = 0
-        if revenue == 0:
-            penalty = net_fixed * 0.50
+        penalty = net_fixed * 0.50 if revenue == 0 else 0
 
         final_salary = net_fixed + perf + commission + wp_allowance - penalty
-
         effective_pct = (commission / revenue * 100) if revenue > 0 else 0
 
         return pd.Series({
             "Ideal_Fixed_Pay": round(fixed,2),
-            "Net_Fixed_Pay" :  round(net_fixed,2),
+            "Net_Fixed_Pay": round(net_fixed,2),
             "Performance_Pay": round(perf,2),
             "Performance_%": perf_pct,
             "PT_Commission": round(commission,2),
@@ -303,100 +289,49 @@ if st.button("🚀 Generate Payroll"):
         })
 
     # ------------------------------------------------------
-    # PROGRESSIVE COMMISSION
-    # ------------------------------------------------------
-
-    def progressive_calc(revenue, slabs):
-
-        commission = 0
-        prev = 0
-
-        for limit, rate in slabs:
-
-            if revenue > limit:
-                commission += (limit - prev) * rate
-                prev = limit
-            else:
-                commission += (revenue - prev) * rate
-                return commission
-
-        commission += (revenue - prev) * slabs[-1][1]
-        return commission
-
-    # ------------------------------------------------------
-    # FEEDBACK
-    # ------------------------------------------------------
-
-    def feedback_msg(revenue):
-
-        if revenue == 0:
-            return "No PT revenue generated"
-        elif revenue < 30000:
-            return "Below expectation"
-        elif revenue < 50000:
-            return "Good going but try hard"
-        elif revenue < 80000:
-            return "Great performance"
-        else:
-            return "Excellent performance"
-
-    # ------------------------------------------------------
     # APPLY SALARY
     # ------------------------------------------------------
 
     salary_df = merged_df.apply(calculate_salary, axis=1)
 
-    # Remove duplicate columns before merging salary_df
-    cols_to_drop = [
-        "Ideal_Fixed_Salary",
-        "Net_Fixed_Salary",
-        "Performance_Pay",
-        "Performance_%",
-        "PT_Commission",
-        "Effective_PT_%",
-        "Final_Salary",
-        "Feedback"
-    ]
-
-    merged_df = merged_df.drop(columns=[col for col in cols_to_drop if col in merged_df.columns])
-    
-    #final_df = pd.concat([merged_df, salary_df], axis=1)
-
+    # Clean overwrite (no duplicates)
     for col in salary_df.columns:
         merged_df[col] = salary_df[col]
 
-    final_df = merged_df
+    final_df = merged_df.copy()
 
+    # ------------------------------------------------------
+    # TRACKING FIELDS
+    # ------------------------------------------------------
 
-    # Add tracking columns in required order
     final_df["Payroll_Month"] = payroll_month
     final_df["Payroll_Run_ID"] = payroll_run_id
     final_df["Payroll_Run_Date"] = payroll_run_date
 
     final_df = final_df.sort_values(by="PT_Revenue", ascending=False)
 
+    # ------------------------------------------------------
+    # TOTAL ROW
+    # ------------------------------------------------------
+
     total_row = {
-    "Emp_ID": "TOTALS",
-    "Trainer_Name": "",
-    "Designation": "",
-
-    "PT_Revenue": final_df["PT_Revenue"].sum(),
-    "Net_Fixed_Pay": final_df["Net_Fixed_Pay"].sum(),
-    "Performance_Pay": final_df["Performance_Pay"].sum(),
-    "PT_Commission": final_df["PT_Commission"].sum(),
-    "WP_Resp_Allowance": final_df["WP_Resp_Allowance"].sum(),
-    "Penalty": final_df["Penalty"].sum(),
-    "Final_Salary": final_df["Final_Salary"].sum(),
-
-    "Performance_%": "-",
-    "Effective_PT_%": "-",
-    "Feedback": "-"
+        "Emp_ID": "TOTALS",
+        "Trainer_Name": "",
+        "Designation": "",
+        "PT_Revenue": final_df["PT_Revenue"].sum(),
+        "Net_Fixed_Pay": final_df["Net_Fixed_Pay"].sum(),
+        "Performance_Pay": final_df["Performance_Pay"].sum(),
+        "PT_Commission": final_df["PT_Commission"].sum(),
+        "WP_Resp_Allowance": final_df["WP_Resp_Allowance"].sum(),
+        "Penalty": final_df["Penalty"].sum(),
+        "Final_Salary": final_df["Final_Salary"].sum(),
+        "Performance_%": "-",
+        "Effective_PT_%": "-",
+        "Feedback": "-"
     }
 
     total_df = pd.DataFrame([total_row])
-
     export_df = pd.concat([final_df, total_df], ignore_index=True)
-
     # ------------------------------------------------------
     # UPDATE GOOGLE SHEET (MARK PROCESSED)
     # ------------------------------------------------------
