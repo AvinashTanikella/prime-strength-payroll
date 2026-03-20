@@ -516,8 +516,8 @@ if st.button("🚀 Generate Payroll"):
         # -------------------------------
             ('LEFTPADDING', (0,0), (-1,-1), 3),
             ('RIGHTPADDING', (0,0), (-1,-1), 3),
-            ('TOPPADDING', (0,0), (-1,-1), 2),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 2),
+            ('TOPPADDING', (0,0), (-1,-1), 6),
+            ('BOTTOMPADDING', (0,0), (-1,-1), 6),
         # -------------------------------
         # TOTAL ROW STYLING
         # -------------------------------
