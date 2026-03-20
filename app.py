@@ -479,7 +479,7 @@ if st.button("🚀 Generate Payroll"):
             new_row = []
             for i, cell in enumerate(row):
                 if i == feedback_col_index:
-                    new_row.append(Paragraph(str(cell), styles['Normal']))
+                    new_row.append(Paragraph(str(cell), styles['Normal'].fontSize = 6))
                 else:
                     new_row.append(cell)
             table_data.append(new_row)
