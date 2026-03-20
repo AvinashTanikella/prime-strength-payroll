@@ -16,7 +16,7 @@ FULL SYSTEM:
     • Final Salary
     • Performance %
     • Effective PT %
-    • Feedback
+    • Raring-Message
 ===========================================================
 """
 
@@ -251,21 +251,21 @@ if st.button("🚀 Generate Payroll"):
 
 
     # ------------------------------------------------------
-    # FEEDBACK FUNCTION (ALSO REQUIRED)
+    # FEEDBACK FUNCTION
     # ------------------------------------------------------
 
-    def feedback_msg(revenue):
+    def rating_msg(revenue):
 
         if revenue == 0:
-            return "No PT revenue generated"
+            return "1-Poor"
         elif revenue < 30000:
-            return "Below expectation"
+            return "2-Below Expctd."
         elif revenue < 50000:
-            return "Good going but try hard"
+            return "3-Average"
         elif revenue < 80000:
-            return "Great performance"
+            return "4-Great"
         else:
-            return "Excellent performance"
+            return "5-Excellent"
     
     # ------------------------------------------------------
     # SALARY CALCULATION
@@ -336,7 +336,7 @@ if st.button("🚀 Generate Payroll"):
         # ---------------- FINAL ----------------
         "Final_Salary": round(final_salary, 2),
         "Performance_%": perf_pct,
-        "Feedback": feedback_msg(revenue)
+        "Rating-Msg": rating_msg(revenue)
     })
 
     # ------------------------------------------------------
@@ -378,7 +378,7 @@ if st.button("🚀 Generate Payroll"):
         "Final_Salary": final_df["Final_Salary"].sum(),
         "Performance_%": "-",
         "Effective_PT_%": "-",
-        "Feedback": "-"
+        "Rating-Msg": "-"
     }
 
     total_df = pd.DataFrame([total_row])
@@ -567,7 +567,7 @@ if st.button("🚀 Generate Payroll"):
 
     # ---------------- FINAL ----------------
     "Final_Salary",
-    "Feedback"
+    "Rating-Msg"
     ]
 
     st.subheader("📊 Final Payroll Output")
@@ -598,7 +598,7 @@ if st.button("🚀 Generate Payroll"):
         "WP_Allowance",
         "Penalty",
         "Final_Salary",
-        "Feedback"]
+        "Rating-Msg"]
     
     pdf_file = f"PrimeStrength_Payroll_{payroll_month}.pdf"
 
