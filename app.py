@@ -314,7 +314,7 @@ if st.button("🚀 Generate Payroll"):
         final_salary = net_fixed + perf + commission + wp_allowance - penalty
         effective_pct = (commission / revenue * 100) if revenue > 0 else 0
 
-    return pd.Series({
+        return pd.Series({
         # ---------------- IDEAL ----------------
         "Ideal_Base_Salary": round(base, 2),
         "Ideal_Fixed_Pay": round(fixed, 2),
