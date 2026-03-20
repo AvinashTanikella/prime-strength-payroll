@@ -507,7 +507,7 @@ if st.button("🚀 Generate Payroll"):
         # -------------------------------
             ('BACKGROUND', (0,0), (-1,0), colors.grey),
             ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-            ('FONTSIZE', (0,0), (-1,-1), 6),
+            ('FONTSIZE', (0,0), (-1,-1), 6.5),
             ('GRID', (0,0), (-1,-1), 0.5, colors.black),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
             ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
@@ -523,8 +523,8 @@ if st.button("🚀 Generate Payroll"):
         # -------------------------------
             ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
             ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-        #   ('FONTSIZE', (0, -1), (-1, -1), 8),
-        #   ('TEXTCOLOR', (0, -1), (-1, -1), colors.black),
+            ('FONTSIZE', (0, -1), (-1, -1), 8),
+            ('TEXTCOLOR', (0, -1), (-1, -1), colors.black),
         # -------------------------------
         # MERGE FIRST 3 COLUMNS
         # -------------------------------
