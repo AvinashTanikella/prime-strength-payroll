@@ -481,7 +481,8 @@ if st.button("🚀 Generate Payroll"):
             leading=7  # controls row height (important)
         )
 
-        table_data = [df.columns.tolist()]
+        #table_data = [df.columns.tolist()]
+        table_data = [[Paragraph(str(col), uniform_style) for col in df.columns]]
 
         for row in df.values.tolist():
             new_row = []
