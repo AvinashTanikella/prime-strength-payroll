@@ -371,7 +371,7 @@ if st.button("🚀 Generate Payroll"):
         "Designation": "",
         "PT_Revenue": final_df["PT_Revenue"].sum(),
         "Net_Fixed_Pay": final_df["Net_Fixed_Pay"].sum(),
-        "Net_Performance_Pay": final_df["Performance_Pay"].sum(),
+        "Net_Performance_Pay": final_df["Net_Performance_Pay"].sum(),
         "PT_Commission": final_df["PT_Commission"].sum(),
         "WP_Resp_Allowance": final_df["WP_Resp_Allowance"].sum(),
         "Penalty": final_df["Penalty"].sum(),
