@@ -471,7 +471,18 @@ if st.button("🚀 Generate Payroll"):
         # TABLE
         # -------------------------------
 
-        table_data = [df.columns.tolist()] + df.values.tolist()
+        feedback_col_index = list(df.columns).index("Feedback")
+        
+        table_data = [df.columns.tolist()]
+
+        for row in df.values.tolist():
+            new_row = []
+            for i, cell in enumerate(row):
+                if i == feedback_col_index:
+                    new_row.append(Paragraph(str(cell), styles['Normal']))
+                else:
+                    new_row.append(cell)
+            table_data.append(new_row)
 
         available_width = doc.width
         num_cols = len(df.columns)
