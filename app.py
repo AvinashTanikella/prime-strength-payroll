@@ -520,7 +520,7 @@ if st.button("🚀 Generate Payroll"):
             ('BACKGROUND', (0,0), (-1,0), colors.grey),
             ('TEXTCOLOR',(0,0),(-1,0),colors.white),
             ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0,0), (-1,0), 7),
+            ('FONTSIZE', (0,0), (-1,0), 8),
             ('TOPPADDING', (0,0), (-1,0), 8),
             ('BOTTOMPADDING', (0,0), (-1,0), 8),
         # -------------------------------        
