@@ -475,18 +475,25 @@ if st.button("🚀 Generate Payroll"):
         
         table_data = [df.columns.tolist()]
 
+        uniform_style = ParagraphStyle(
+            'uniform_style',
+            parent=styles['Normal'],
+            fontSize=6,
+            leading=7  # controls row height (important)
+        )
+
         for row in df.values.tolist():
             new_row = []
             for i, cell in enumerate(row):
                 if i == feedback_col_index:
-                    new_row.append(Paragraph(str(cell), styles['Normal'].fontSize = 6))
+                    new_row.append(Paragraph(str(cell), uniform_style))
                 else:
                     new_row.append(cell)
             table_data.append(new_row)
 
         available_width = doc.width
         num_cols = len(df.columns)
-    
+
         table = Table(table_data, repeatRows=1, colWidths=[available_width / num_cols] * num_cols)
 
         table.setStyle(TableStyle([
@@ -495,7 +502,7 @@ if st.button("🚀 Generate Payroll"):
         # -------------------------------
             ('BACKGROUND', (0,0), (-1,0), colors.grey),
             ('TEXTCOLOR',(0,0),(-1,0),colors.white),
-            ('FONTSIZE', (0,0), (-1,-1), 6),
+            ('FONTSIZE', (0,0), (-1,-1), 6.5),
             ('GRID', (0,0), (-1,-1), 0.5, colors.black),
             ('ALIGN', (0,0), (-1,-1), 'CENTER'),
         # -------------------------------        
