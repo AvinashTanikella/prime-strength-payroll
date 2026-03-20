@@ -530,7 +530,7 @@ if st.button("🚀 Generate Payroll"):
         # -------------------------------
             ('SPAN', (0, -1), (2, -1)),   # Merge col 0 to 2
         # Align TOTALS text to left
-            ('ALIGN', (0, -1), (2, -1), 'LEFT'),
+            ('ALIGN', (0, -1), (2, -1), 'CENTER'),
 
         ]))
 
