@@ -314,18 +314,30 @@ if st.button("🚀 Generate Payroll"):
         final_salary = net_fixed + perf + commission + wp_allowance - penalty
         effective_pct = (commission / revenue * 100) if revenue > 0 else 0
 
-        return pd.Series({
-            "Ideal_Fixed_Pay": round(fixed,2),
-            "Net_Fixed_Pay": round(net_fixed,2),
-            "Performance_Pay": round(perf,2),
-            "Performance_%": perf_pct,
-            "PT_Commission": round(commission,2),
-            "Effective_PT_%": round(effective_pct,2),
-            "WP_Resp_Allowance": round(wp_allowance,2),
-            "Penalty": round(penalty,2),
-            "Final_Salary": round(final_salary,2),
-            "Feedback": feedback_msg(revenue)
-        })
+    return pd.Series({
+        # ---------------- IDEAL ----------------
+        "Ideal_Base_Salary": round(base, 2),
+        "Ideal_Fixed_Pay": round(fixed, 2),
+        "Ideal_Performance_Pay": round(perf_component, 2),
+
+        # ---------------- ACTUAL ----------------
+        "Net_Fixed_Pay": round(net_fixed, 2),
+        "Performance_Pay": round(perf, 2),
+
+        # ---------------- PERFORMANCE ----------------
+        "PT_Revenue": round(revenue, 2),
+        "PT_Commission": round(commission, 2),
+        "Effective_PT_%": round(effective_pct, 2),
+
+        # ---------------- ADJUSTMENTS ----------------
+        "WP_Resp_Allowance": round(wp_allowance, 2),
+        "Penalty": round(penalty, 2),
+
+        # ---------------- FINAL ----------------
+        "Final_Salary": round(final_salary, 2),
+        "Performance_%": perf_pct,
+        "Feedback": feedback_msg(revenue)
+    }))
 
     # ------------------------------------------------------
     # APPLY SALARY
