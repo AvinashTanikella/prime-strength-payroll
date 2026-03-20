@@ -439,6 +439,7 @@ if st.button("🚀 Generate Payroll"):
     from reportlab.lib import colors
     from reportlab.lib.styles import getSampleStyleSheet
     from reportlab.lib.pagesizes import A4, landscape
+    from reportlab.lib.styles import ParagraphStyle
 
     def generate_pdf(df, filename):
 
