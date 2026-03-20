@@ -252,7 +252,7 @@ if st.button("🚀 Generate Payroll"):
     # FEEDBACK FUNCTION
     # ------------------------------------------------------
 
-    def rating_msg(revenue):
+    def rating_msg(revenue, min_t, mid_t, high_t):
 
         if revenue == 0:
             return "1-Poor"
@@ -297,7 +297,6 @@ if st.button("🚀 Generate Payroll"):
 
         fixed = base * 0.60
         perf_component = base * 0.40
-
 
         trainer_type = row.get("Trainer_Type", "Full-Time")
         thresholds = get_thresholds(trainer_type)
@@ -360,7 +359,7 @@ if st.button("🚀 Generate Payroll"):
         # ---------------- FINAL ----------------
         "Final_Salary": round(final_salary, 2),
         "Performance_%": perf_pct,
-        "Rating-Msg": rating_msg(revenue)
+        "Rating-Msg": rating_msg(revenue, min_t, mid_t, high_t)
     })
 
     # ------------------------------------------------------
