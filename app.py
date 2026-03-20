@@ -474,8 +474,6 @@ if st.button("🚀 Generate Payroll"):
 
         feedback_col_index = list(df.columns).index("Feedback")
         
-        table_data = [df.columns.tolist()]
-
         uniform_style = ParagraphStyle(
             'uniform_style',
             parent=styles['Normal'],
@@ -483,13 +481,12 @@ if st.button("🚀 Generate Payroll"):
             leading=7  # controls row height (important)
         )
 
+        table_data = [df.columns.tolist()]
+
         for row in df.values.tolist():
             new_row = []
             for i, cell in enumerate(row):
-                if i == feedback_col_index:
-                    new_row.append(Paragraph(str(cell), uniform_style))
-                else:
-                    new_row.append(cell)
+                new_row.append(Paragraph(str(cell), uniform_style))
             table_data.append(new_row)
 
         available_width = doc.width
