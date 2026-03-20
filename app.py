@@ -227,6 +227,46 @@ if st.button("🚀 Generate Payroll"):
     # Ensure allowance safe
     merged_df["WP_Resp_Allowance"] = merged_df["WP_Resp_Allowance"].fillna(0)
 
+
+    # ------------------------------------------------------
+    # PROGRESSIVE COMMISSION (FIXED POSITION)
+    # ------------------------------------------------------
+
+    def progressive_calc(revenue, slabs):
+
+        commission = 0
+        prev = 0
+
+        for limit, rate in slabs:
+
+            if revenue > limit:
+                commission += (limit - prev) * rate
+                prev = limit
+            else:
+                commission += (revenue - prev) * rate
+                return commission
+
+        commission += (revenue - prev) * slabs[-1][1]
+        return commission
+
+
+    # ------------------------------------------------------
+    # FEEDBACK FUNCTION (ALSO REQUIRED)
+    # ------------------------------------------------------
+
+    def feedback_msg(revenue):
+
+        if revenue == 0:
+            return "No PT revenue generated"
+        elif revenue < 30000:
+            return "Below expectation"
+        elif revenue < 50000:
+            return "Good going but try hard"
+        elif revenue < 80000:
+            return "Great performance"
+        else:
+            return "Excellent performance"
+    
     # ------------------------------------------------------
     # SALARY CALCULATION
     # ------------------------------------------------------
