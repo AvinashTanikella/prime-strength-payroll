@@ -322,7 +322,7 @@ if st.button("🚀 Generate Payroll"):
 
         # ---------------- ACTUAL ----------------
         "Net_Fixed_Pay": round(net_fixed, 2),
-        "Performance_Pay": round(perf, 2),
+        "Net_Performance_Pay": round(perf, 2),
 
         # ---------------- PERFORMANCE ----------------
         "PT_Revenue": round(revenue, 2),
@@ -371,7 +371,7 @@ if st.button("🚀 Generate Payroll"):
         "Designation": "",
         "PT_Revenue": final_df["PT_Revenue"].sum(),
         "Net_Fixed_Pay": final_df["Net_Fixed_Pay"].sum(),
-        "Performance_Pay": final_df["Performance_Pay"].sum(),
+        "Net_Performance_Pay": final_df["Performance_Pay"].sum(),
         "PT_Commission": final_df["PT_Commission"].sum(),
         "WP_Resp_Allowance": final_df["WP_Resp_Allowance"].sum(),
         "Penalty": final_df["Penalty"].sum(),
@@ -519,26 +519,42 @@ if st.button("🚀 Generate Payroll"):
     st.success(f"✅ Payroll Generated Successfully | Run: {payroll_run_id} | Time: {today.strftime('%d %b %Y, %I:%M %p')}")
     
     display_columns = [
-        "Payroll_Month",       
-        "Payroll_Run_ID",      
-        "Payroll_Run_Date",    
-        "Emp_ID",
-        "Trainer_Name",
-        "Phone_Number",
-        "Email_Address",
-        "Trainer_Type",
-        "Designation",
-        "Base_Salary",
-        "PT_Revenue",
-        "Net_Fixed_Pay",
-        "Performance_Pay",
-        "Performance_%",
-        "PT_Commission",
-        "Effective_PT_%",
-        "WP_Resp_Allowance",
-        "Penalty",
-        "Final_Salary",
-        "Feedback"]
+    # ---------------- TRACKING ----------------
+    "Payroll_Month",
+    "Payroll_Run_ID",
+    "Payroll_Run_Date",
+
+    # ---------------- EMPLOYEE ----------------
+    "Emp_ID",
+    "Trainer_Name",
+    "Phone_Number",
+    "Email_Address",
+    "Trainer_Type",
+    "Designation",
+
+    # ---------------- IDEAL ----------------
+    "Ideal_Base_Salary",
+    "Ideal_Fixed_Pay",
+    "Ideal_Performance_Pay",
+
+    # ---------------- ACTUAL ----------------
+    "Net_Fixed_Pay",
+    "Net_Performance_Pay",
+    "Performance_%",
+
+    # ---------------- PERFORMANCE ----------------
+    "PT_Revenue",
+    "PT_Commission",
+    "Effective_PT_%",
+
+    # ---------------- ADJUSTMENTS ----------------
+    "WP_Resp_Allowance",
+    "Penalty",
+
+    # ---------------- FINAL ----------------
+    "Final_Salary",
+    "Feedback"
+    ]
 
     st.subheader("📊 Final Payroll Output")
     st.dataframe(final_df[display_columns])
@@ -559,10 +575,10 @@ if st.button("🚀 Generate Payroll"):
         "Emp_ID",
         "Trainer_Name",
         "Designation",
-        "PT_Revenue",
         "Net_Fixed_Pay",
-        "Performance_Pay",
+        "Net_Performance_Pay",
         "Performance_%",
+        "PT_Revenue",
         "PT_Commission",
         "Effective_PT_%",
         "WP_Resp_Allowance",
