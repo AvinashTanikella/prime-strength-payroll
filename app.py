@@ -442,14 +442,14 @@ if st.button("🚀 Generate Payroll"):
 
     def generate_pdf(df, filename):
 
-    doc = SimpleDocTemplate(
-        filename,
-        pagesize=landscape(A4),
-        leftMargin=10,
-        rightMargin=10,
-        topMargin=10,
-        bottomMargin=10
-    )
+        doc = SimpleDocTemplate(
+            filename,
+            pagesize=landscape(A4),
+            leftMargin=10,
+            rightMargin=10,
+            topMargin=10,
+            bottomMargin=10
+        )
 
         styles = getSampleStyleSheet()
         elements = []
